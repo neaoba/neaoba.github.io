@@ -35,8 +35,8 @@ body {
 }
 hr {
     display: block;
-    border-style: inset;
-    border-width: 1px 0 0 0;
+    border-style: solid;
+    border-width: 1px;
     border-color: #000;
     margin: 0.2em -0.2em;
 }
