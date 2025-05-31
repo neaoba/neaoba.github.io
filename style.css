@@ -36,7 +36,7 @@ body {
 hr {
     display: block;
     border-style: solid;
-    border-width: 1px;
+    border-width: 1px 0 0 0;
     border-color: #000;
     margin: 0.2em -0.2em;
 }
