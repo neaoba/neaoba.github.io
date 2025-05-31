@@ -25,11 +25,19 @@
               display: block;
               text-align: right;
         }
+        .small {
+            font-size: 0.8em; /* 親要素のフォントサイズの80% */
+        }
+        h1 {
+            font-size: 1em;
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
     <header class="center">
-        index.html
+        <h1>index.html</h1>
         愛のあるユニークで豊かなサイト。
     </header>
     <hr>
@@ -45,16 +53,16 @@
     </nav>
     <hr>
     <nav>
-        ◆<a href="#">ﾒﾆｭｰ</a><br>├説明しますよ<br>└しまうま<br>
-        ◆<a href="#">ﾒﾆｭｰ</a><br>└説明しますよ<br>
-        ◆<a href="#">ﾒﾆｭｰ</a><br>└説明しますよ<br>
+        ◆<a href="#">ﾒﾆｭｰ</a><br><span class="small">├説明しますよ<br>└しまうま<br></span>
+        ◆<a href="#">ﾒﾆｭｰ</a><br><span class="small">└説明しますよ<br></span>
+        ◆<a href="#">ﾒﾆｭｰ</a><br><span class="small">└説明しますよ<br></span>
         <a href="#" class="right">▲ﾍﾟｰｼﾞﾄｯﾌﾟ</a>
     </nav>
     <hr>
     <nav>
-        ◻︎<a href="#">ﾒﾆｭｰ</a><br>├説明しますよ<br>└しまうま<br>
-        ◻︎<a href="#">ﾒﾆｭｰ</a><br>└説明しますよ<br>
-        ◻︎<a href="#">ﾒﾆｭｰ</a><br>└説明しますよ<br>
+        ◻︎<a href="#">ﾒﾆｭｰ</a><br><span class="small">├説明しますよ<br>└しまうま<br></span>
+        ◻︎<a href="#">ﾒﾆｭｰ</a><br><span class="small">└説明しますよ<br></span>
+        ◻︎<a href="#">ﾒﾆｭｰ</a><br><span class="small">└説明しますよ<br></span>
         <a href="#" class="right">▲ﾍﾟｰｼﾞﾄｯﾌﾟ</a>
     </nav>
     <main></main>
