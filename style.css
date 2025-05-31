@@ -35,7 +35,9 @@ body {
 }
 hr {
     display: block;
-    border: 1px 0 0 0 solid #000;
+    border-width: 1px 0 0 0;
+    border-style: solid;
+    border-color: #000;
     margin: 0.2em -0.2em;
 }
 a{
