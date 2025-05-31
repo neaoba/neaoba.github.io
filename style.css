@@ -25,6 +25,11 @@ body {
     font-size: 0.8em;
     line-height: 0.8em;
 }
+.lagos {
+    width: 200px;
+    display: block;
+    margin: 0.2em auto;
+}
 .grey {
     color: #808080;
 }
