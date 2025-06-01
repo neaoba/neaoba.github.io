@@ -1,4 +1,4 @@
-body {
+gbody {
     padding: 0.2em;
     font-family: "DotGothic16", sans-serif;
     font-weight: 400;
@@ -78,6 +78,8 @@ h3 {
 }
 
 img {
+    display: block;
+    margin: 0.2em auto;
     width: 100%;
     /* border: 1px solid #000000; */
 }
