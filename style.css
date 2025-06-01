@@ -73,6 +73,10 @@ h3 {
     margin: 0.2em -0.2em;
     padding: 0.1em;
 }
+main {
+    width: 100%;
+    max-width: 960px;
+}
 /*
 img {
     border: 1px solid #000000;
