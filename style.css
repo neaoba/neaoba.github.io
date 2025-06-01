@@ -4,6 +4,9 @@ body {
     font-weight: 400;
     font-style: normal;
     line-height: 1em;
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
 }
 .left {
     display: block; /* または inline-block */
@@ -72,11 +75,6 @@ h3 {
     text-align: left;
     margin: 0.2em -0.2em;
     padding: 0.1em;
-}
-main {
-    width: 100%;
-    max-width: 960px;
-    margin: 0 auto;
 }
 /*
 img {
