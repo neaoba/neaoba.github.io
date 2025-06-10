@@ -11,6 +11,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        /* 【修正】htmlとbodyの高さを100%に設定し、レイアウトの基準を安定させる */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
         /* カスタムスタイル */
         body {
             font-family: 'Inter', sans-serif;
@@ -99,8 +104,8 @@
 </head>
 <body class="text-gray-200">
 
-    <!-- メインコンテナ -->
-    <div class="flex flex-col md:flex-row h-screen overflow-hidden">
+    <!-- メインコンテナ 【修正】h-screenをh-fullに変更 -->
+    <div class="flex flex-col md:flex-row h-full overflow-hidden">
 
         <!-- 左パネル: エディタ -->
         <div class="w-full md:w-1/2 h-1/2 md:h-full flex flex-col p-4 space-y-2 bg-gray-900">
@@ -117,7 +122,7 @@
                 <button id="js-tab" class="tab-button">JavaScript</button>
             </div>
             
-            <!-- エディタコンテナ 【修正】min-h-0を追加してはみ出しを防止 -->
+            <!-- エディタコンテナ -->
             <div class="relative flex-grow min-h-0">
                 <!-- HTMLエディタ -->
                 <div id="html-editor-pane" class="editor-pane h-full">
