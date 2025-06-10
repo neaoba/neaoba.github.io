@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コードサンドボックス</title>
+    <!-- Tailwind CSSを読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (InterとFira Code)を読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* カスタムスタイル */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* ダークグレー */
+        }
+        /* エディタエリアのフォントをFira Code（コーディング用フォント）に設定 */
+        .code-editor {
+            font-family: 'Fira Code', monospace;
+            background-color: #1F2937; /* やや明るいダークグレー */
+            color: #E5E7EB; /* 明るいグレー */
+            border: 1px solid #374151; /* ボーダー色 */
+            border-radius: 0.5rem; /* 角丸 */
+            transition: border-color 0.2s; /* ホバー時のトランジション */
+        }
+        .code-editor:focus {
+            outline: none;
+            border-color: #3B82F6; /* フォーカス時に青色ボーダー */
+        }
+        /* スクロールバーのスタイル */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1F2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4B5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <!-- メインコンテナ -->
+    <div class="flex flex-col md:flex-row h-screen overflow-hidden">
+
+        <!-- 左パネル: エディタ -->
+        <div class="w-full md:w-1/2 h-1/2 md:h-full flex flex-col p-4 space-y-4 bg-gray-900 overflow-y-auto">
+            
+            <header class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-white">コードサンドボックス</h1>
+                <span class="text-sm text-gray-400">リアルタイムプレビュー</span>
+            </header>
+            
+            <!-- HTMLエディタ -->
+            <div>
+                <label for="html-code" class="block mb-2 text-sm font-medium text-gray-300">HTML</label>
+                <textarea id="html-code" class="code-editor w-full h-40 md:h-48 p-3 text-sm" spellcheck="false"><!-- サンプルコードをここに記述 -->
+<div class="container">
+  <h1>こんにちは！</h1>
+  <p>下のボタンをクリックしてみてください。</p>
+  <button id="myButton">クリック！</button>
+</div></textarea>
+            </div>
+
+            <!-- CSSエディタ -->
+            <div>
+                <label for="css-code" class="block mb-2 text-sm font-medium text-gray-300">CSS</label>
+                <textarea id="css-code" class="code-editor w-full h-40 md:h-48 p-3 text-sm" spellcheck="false">/* サンプルスタイルをここに記述 */
+body {
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f0f0f0;
+  color: #333;
+}
+.container {
+  text-align: center;
+  padding: 2em;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+h1 {
+  color: #007BFF;
+  transition: color 0.3s;
+}
+button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s;
+}
+button:hover {
+  background-color: #0056b3;
+}</textarea>
+            </div>
+
+            <!-- JavaScriptエディタ -->
+            <div>
+                <label for="js-code" class="block mb-2 text-sm font-medium text-gray-300">JavaScript</label>
+                <textarea id="js-code" class="code-editor w-full h-40 md:h-48 p-3 text-sm" spellcheck="false">// サンプルスクリプトをここに記述
+const button = document.getElementById('myButton');
+const h1 = document.querySelector('h1');
+
+button.addEventListener('click', () => {
+  h1.textContent = 'クリックされました!';
+  h1.style.color = '#dc2626'; // 赤色に変更
+});</textarea>
+            </div>
+            
+        </div>
+
+        <!-- 右パネル: プレビュー -->
+        <div class="w-full md:w-1/2 h-1/2 md:h-full flex flex-col">
+            <div class="p-4 bg-gray-800 border-b border-gray-700">
+                <h2 class="text-lg font-semibold text-white">プレビュー</h2>
+            </div>
+            <iframe id="preview-frame" class="w-full h-full bg-white" title="プレビュー"></iframe>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM要素を取得
+            const htmlCode = document.getElementById('html-code');
+            const cssCode = document.getElementById('css-code');
+            const jsCode = document.getElementById('js-code');
+            const previewFrame = document.getElementById('preview-frame');
+
+            /**
+             * プレビューを更新する関数
+             */
+            const updatePreview = () => {
+                // iframeの中身を取得
+                const preview = previewFrame.contentDocument || previewFrame.contentWindow.document;
+
+                // iframeに書き込むHTMLを構築
+                // ユーザーのHTML, CSS, JSを埋め込む
+                // 注意：</script>という文字列がJS内に直接現れると、この<script>タグが終了してしまうため、エスケープする
+                const content = `
+                    <!DOCTYPE html>
+                    <html lang="ja">
+                    <head>
+                        <style>
+                            ${cssCode.value}
+                        </style>
+                    </head>
+                    <body>
+                        ${htmlCode.value}
+                        <script>
+                            try {
+                                ${jsCode.value}
+                            } catch (e) {
+                                console.error(e);
+                            }
+                        <\/script>
+                    </body>
+                    </html>
+                `;
+
+                // iframeに構築したHTMLを書き込む
+                preview.open();
+                preview.write(content);
+                preview.close();
+            };
+
+            /**
+             * 入力のたびにプレビューを更新するのを抑制（デバウンス）する関数
+             * @param {function} func - 実行する関数
+             * @param {number} delay - 遅延時間 (ms)
+             * @returns {function}
+             */
+            const debounce = (func, delay) => {
+                let timeout;
+                return (...args) => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), delay);
+                };
+            };
+            
+            // 500msのデバウンスを設定して、入力が止まってからプレビューを更新
+            const debouncedUpdate = debounce(updatePreview, 500);
+
+            // 各エディタの入力イベントを監視
+            htmlCode.addEventListener('input', debouncedUpdate);
+            cssCode.addEventListener('input', debouncedUpdate);
+            jsCode.addEventListener('input', debouncedUpdate);
+
+            // ページ読み込み時に初回プレビューを実行
+            updatePreview();
+        });
+    </script>
+
+</body>
+</html>
