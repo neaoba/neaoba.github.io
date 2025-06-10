@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コードサンドボックス</title>
+    <!-- Tailwind CSSを読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (InterとFira Code)を読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!--【追加】ZIPファイル作成ライブラリ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        /* htmlとbodyの高さを100%に設定し、レイアウトの基準を安定させる */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        /* カスタムスタイル */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* ダークグレー */
+        }
+
+        .editor-wrapper {
+            position: relative;
+            display: flex;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            background-color: #1F2937;
+            overflow: hidden;
+            transition: border-color 0.2s;
+            height: 100%;
+        }
+        
+        .editor-wrapper:focus-within {
+             border-color: #3B82F6; /* フォーカス時に青色ボーダー */
+        }
+        
+        .line-numbers {
+            padding: 0.75rem 0.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #6B7280;
+            text-align: right;
+            user-select: none;
+            background-color: #1F2937;
+            border-right: 1px solid #374151;
+            overflow-y: hidden;
+        }
+
+        .code-editor {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #E5E7EB;
+            background-color: transparent;
+            border: none;
+            resize: none;
+            flex-grow: 1;
+            padding: 0.75rem;
+            height: 100%;
+        }
+        
+        .code-editor:focus {
+            outline: none;
+        }
+
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background-color: transparent;
+            color: #9CA3AF;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-button.active {
+            color: #F9FAFB;
+            border-bottom-color: #3B82F6;
+        }
+        .tab-button:hover:not(.active) {
+            background-color: #374151;
+        }
+
+        /* スクロールバーのスタイル */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1F2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4B5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <!-- メインコンテナ -->
+    <div class="flex flex-col md:flex-row h-full overflow-hidden">
+
+        <!-- 左パネル: エディタ -->
+        <div class="w-full md:w-1/2 h-1/2 md:h-full flex flex-col p-4 space-y-2 bg-gray-900">
+            
+            <header class="flex-shrink-0 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-white">コードサンドボックス</h1>
+                    <span class="text-sm text-gray-400">リアルタイムプレビュー</span>
+                </div>
+                <!--【追加】エクスポートボタン -->
+                <button id="export-zip" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span>エクスポート</span>
+                </button>
+            </header>
+            
+            <!--タブナビゲーション -->
+            <div class="flex-shrink-0 flex border-b border-gray-700">
+                <button id="html-tab" class="tab-button active">HTML</button>
+                <button id="css-tab" class="tab-button">CSS</button>
+                <button id="js-tab" class="tab-button">JavaScript</button>
+            </div>
+            
+            <!-- エディタコンテナ -->
+            <div class="relative flex-grow min-h-0">
+                <!-- HTMLエディタ -->
+                <div id="html-editor-pane" class="editor-pane h-full">
+                    <div class="editor-wrapper">
+                        <div class="line-numbers" id="html-line-numbers">1</div>
+                        <textarea id="html-code" class="code-editor" spellcheck="false"></textarea>
+                    </div>
+                </div>
+
+                <!-- CSSエディタ -->
+                <div id="css-editor-pane" class="editor-pane h-full hidden">
+                    <div class="editor-wrapper">
+                        <div class="line-numbers" id="css-line-numbers">1</div>
+                        <textarea id="css-code" class="code-editor" spellcheck="false"></textarea>
+                    </div>
+                </div>
+
+                <!-- JavaScriptエディタ -->
+                <div id="js-editor-pane" class="editor-pane h-full hidden">
+                    <div class="editor-wrapper">
+                        <div class="line-numbers" id="js-line-numbers">1</div>
+                        <textarea id="js-code" class="code-editor" spellcheck="false"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- 右パネル: プレビュー -->
+        <div class="w-full md:w-1/2 h-1/2 md:h-full flex flex-col">
+            <div class="p-4 bg-gray-800 border-b border-gray-700 flex-shrink-0">
+                <h2 class="text-lg font-semibold text-white">プレビュー</h2>
+            </div>
+            <iframe id="preview-frame" class="w-full flex-grow bg-white" title="プレビュー"></iframe>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const htmlCode = document.getElementById('html-code');
+            const cssCode = document.getElementById('css-code');
+            const jsCode = document.getElementById('js-code');
+            const previewFrame = document.getElementById('preview-frame');
+            const exportButton = document.getElementById('export-zip');
+
+            // --- 初期コードの内容 ---
+            const initialHTML = `<div class="container">
+    <h1>こんにちは！</h1>
+    <p>下のボタンをクリックしてみてください。</p>
+    <button id="myButton">クリック！</button>
+</div>`;
+            const initialCSS = `/* サンプルスタイルをここに記述 */
+body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    color: #333;
+}
+.container {
+    text-align: center;
+    padding: 2em;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #007BFF;
+    transition: color 0.3s;
+}
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+button:hover {
+    background-color: #0056b3;
+}`;
+            const initialJS = `// サンプルスクリプトをここに記述
+const button = document.getElementById('myButton');
+const h1 = document.querySelector('h1');
+
+button.addEventListener('click', () => {
+    h1.textContent = 'クリックされました!';
+    h1.style.color = '#dc2626'; // 赤色に変更
+});`;
+
+            // --- エディタの初期化 ---
+            htmlCode.value = initialHTML.trim();
+            cssCode.value = initialCSS.trim();
+            jsCode.value = initialJS.trim();
+
+
+            /** プレビューを更新する関数 */
+            const updatePreview = () => {
+                const previewDocument = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                const content = `
+                    <!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><style>${cssCode.value}</style></head>
+                    <body>${htmlCode.value}<script>
+                        try { ${jsCode.value} } catch (error) { console.error('Preview JS Error:', error); }
+                    <\/script></body></html>`;
+                previewDocument.open();
+                previewDocument.write(content);
+                previewDocument.close();
+            };
+
+            /** デバウンス関数 */
+            const debounce = (callback, wait) => {
+                let timeoutId = null;
+                return (...args) => {
+                    window.clearTimeout(timeoutId);
+                    timeoutId = window.setTimeout(() => callback.apply(null, args), wait);
+                };
+            };
+            
+            const debouncedUpdate = debounce(updatePreview, 500);
+
+            [htmlCode, cssCode, jsCode].forEach(editor => {
+                editor.addEventListener('input', debouncedUpdate);
+            });
+            
+            // --- タブ切り替え機能 ---
+            const tabs = document.querySelectorAll('.tab-button');
+            const panes = document.querySelectorAll('.editor-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    panes.forEach(p => p.classList.add('hidden'));
+                    tab.classList.add('active');
+                    const targetPaneId = tab.id.replace('-tab', '-editor-pane');
+                    document.getElementById(targetPaneId).classList.remove('hidden');
+                });
+            });
+
+
+            /** Emmetの省略記法を展開する関数 */
+            const expandEmmet = (abbr) => {
+                let tagName = abbr.match(/^[a-zA-Z0-9-:]+/)?.[0] || 'div';
+                let rest = abbr.substring(tagName.length);
+                const idMatch = rest.match(/#([a-zA-Z0-9-]+)/);
+                const id = idMatch ? idMatch[1] : null;
+                if (id) rest = rest.replace(`#${id}`, '');
+                const classes = (rest.match(/\.([a-zA-Z0-9-]+)/g) || []).map(c => c.substring(1));
+                let html = `<${tagName}`;
+                if (id) html += ` id="${id}"`;
+                if (classes.length > 0) html += ` class="${classes.join(' ')}"`;
+                const selfClosingTags = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+                if (selfClosingTags.includes(tagName.toLowerCase())) {
+                    html += '>';
+                } else {
+                    html += `></${tagName}>`;
+                }
+                return html;
+            };
+            
+            /** 省略記法がEmmetとして妥当かチェックする関数 */
+            const isLikelyEmmet = (abbr) => {
+                return abbr && !/\s/.test(abbr) && !/[<>]/.test(abbr) && (abbr.includes('.') || abbr.includes('#'));
+            };
+
+            /** スマート自動インデントとTabキーを処理する共通ハンドラ */
+            const handleEditorKeyDown = (e) => {
+                const textarea = e.target;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const text = textarea.value;
+
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+                    const currentLine = text.substring(lineStart, start);
+                    const indentationMatch = currentLine.match(/^\s*/);
+                    let indentation = indentationMatch ? indentationMatch[0] : '';
+                    
+                    const prevLineTrimmed = currentLine.trim();
+                    const opensBlock = /<([a-zA-Z0-9]+)(?![^>]*\/>)[^>]*>$/.test(prevLineTrimmed) && !prevLineTrimmed.startsWith('</');
+                    if (prevLineTrimmed.endsWith('{') || opensBlock) {
+                        indentation += '  ';
+                    }
+                    const newText = text.substring(0, start) + '\n' + indentation + text.substring(end);
+                    textarea.value = newText;
+                    const newCursorPos = start + 1 + indentation.length;
+                    textarea.selectionStart = newCursorPos;
+                    textarea.selectionEnd = newCursorPos;
+                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                } 
+                else if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const newText = text.substring(0, start) + '  ' + text.substring(end);
+                    textarea.value = newText;
+                    const newPos = start + 2;
+                    textarea.selectionStart = newPos;
+                    textarea.selectionEnd = newPos;
+                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            };
+
+            htmlCode.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab' || e.key === 'Enter') {
+                    const textarea = e.target;
+                    const start = textarea.selectionStart;
+                    const text = textarea.value;
+                    const textBeforeCursor = text.substring(0, start);
+                    const lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
+                    const lastNewlineIndex = textBeforeCursor.lastIndexOf('\n');
+                    const wordStart = Math.max(lastSpaceIndex, lastNewlineIndex) + 1;
+                    const abbreviation = text.substring(wordStart, start).trim();
+
+                    if (isLikelyEmmet(abbreviation)) {
+                        e.preventDefault();
+                        const expanded = expandEmmet(abbreviation);
+                        const newText = text.substring(0, wordStart) + expanded + text.substring(start);
+                        textarea.value = newText;
+                        const newCursorPos = (text.substring(0, wordStart) + expanded).lastIndexOf('</');
+                        if (newCursorPos !== -1) {
+                            textarea.setSelectionRange(newCursorPos, newCursorPos);
+                        } else {
+                            const finalPos = wordStart + expanded.length;
+                            textarea.setSelectionRange(finalPos, finalPos);
+                        }
+                        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                    } else {
+                        handleEditorKeyDown(e);
+                    }
+                }
+            });
+
+            cssCode.addEventListener('keydown', handleEditorKeyDown);
+            jsCode.addEventListener('keydown', handleEditorKeyDown);
+            
+            // --- 行番号表示機能 ---
+            const setupLineNumbers = (editor, lineNumbersContainer) => {
+                const update = () => {
+                    const lineCount = editor.value.split('\n').length;
+                    lineNumbersContainer.innerHTML = Array.from({ length: Math.max(1, lineCount) }, (_, i) => `<div>${i + 1}</div>`).join('');
+                };
+                const syncScroll = () => { lineNumbersContainer.scrollTop = editor.scrollTop; };
+                editor.addEventListener('input', update);
+                editor.addEventListener('scroll', syncScroll);
+                update();
+                syncScroll();
+            };
+
+            setupLineNumbers(htmlCode, document.getElementById('html-line-numbers'));
+            setupLineNumbers(cssCode, document.getElementById('css-line-numbers'));
+            setupLineNumbers(jsCode, document.getElementById('js-line-numbers'));
+
+            // ---【追加】エクスポート機能 ---
+            exportButton.addEventListener('click', () => {
+                const zip = new JSZip();
+                
+                // 実行可能なHTMLファイルを生成
+                const exportableHtml = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exported Project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+${htmlCode.value}
+    <script src="script.js"><\/script>
+</body>
+</html>`;
+                
+                zip.file("index.html", exportableHtml);
+                zip.file("style.css", cssCode.value);
+                zip.file("script.js", jsCode.value);
+
+                zip.generateAsync({type:"blob"})
+                    .then(function(content) {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(content);
+                        link.download = "code-sandbox-project.zip";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    });
+            });
+
+            // ページ読み込み時に初回プレビューを実行
+            updatePreview();
+        });
+    </script>
+
+</body>
+</html>
