@@ -147,27 +147,23 @@ button.addEventListener('click', () => {
              * プレビューを更新する関数
              */
             const updatePreview = () => {
-                // iframeの中身を取得
-                const preview = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                const previewDocument = previewFrame.contentDocument || previewFrame.contentWindow.document;
 
                 // iframeに書き込むHTMLを構築
-                // ユーザーのHTML, CSS, JSを埋め込む
-                // 注意：</script>という文字列がJS内に直接現れると、この<script>タグが終了してしまうため、エスケープする
                 const content = `
                     <!DOCTYPE html>
                     <html lang="ja">
                     <head>
-                        <style>
-                            ${cssCode.value}
-                        </style>
+                        <meta charset="UTF-8">
+                        <style>${cssCode.value}</style>
                     </head>
                     <body>
                         ${htmlCode.value}
                         <script>
                             try {
                                 ${jsCode.value}
-                            } catch (e) {
-                                console.error(e);
+                            } catch (error) {
+                                console.error('Preview JS Error:', error);
                             }
                         <\/script>
                     </body>
@@ -175,22 +171,24 @@ button.addEventListener('click', () => {
                 `;
 
                 // iframeに構築したHTMLを書き込む
-                preview.open();
-                preview.write(content);
-                preview.close();
+                previewDocument.open();
+                previewDocument.write(content);
+                previewDocument.close();
             };
 
             /**
              * 入力のたびにプレビューを更新するのを抑制（デバウンス）する関数
-             * @param {function} func - 実行する関数
-             * @param {number} delay - 遅延時間 (ms)
+             * @param {function} callback - 実行する関数
+             * @param {number} wait - 遅延時間 (ms)
              * @returns {function}
              */
-            const debounce = (func, delay) => {
-                let timeout;
+            const debounce = (callback, wait) => {
+                let timeoutId = null;
                 return (...args) => {
-                    clearTimeout(timeout);
-                    timeout = setTimeout(() => func.apply(this, args), delay);
+                    window.clearTimeout(timeoutId);
+                    timeoutId = window.setTimeout(() => {
+                        callback.apply(null, args);
+                    }, wait);
                 };
             };
             
