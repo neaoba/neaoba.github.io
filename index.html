@@ -7,33 +7,41 @@
     <title>Your Name - Portfolio</title>
 
     <style>
-        /* カラーテーマ */
-        :root {
-            --bg-color-light: #F3F4F6; /* 明るい背景色 (元: gray-100) */
-            --text-color-light: #1F2937; /* 明るい文字色 (元: gray-800) */
-            --logo-color-light: #9CA3AF; /* 明るいロゴ色 (元: gray-400) */
-            --footer-text-color-light: #6B7281; /* 明るいフッター文字色 (元: gray-500) */
-
-            --bg-color-dark: #111827; /* 暗い背景色 (元: gray-900) */
-            --text-color-dark: #E5E7EB; /* 暗い文字色 (元: gray-200) */
-            --logo-color-dark: #4B5563; /* 暗いロゴ色 (元: gray-600) */
-            --footer-text-color-dark: #9CA3AF; /* 暗いフッター文字色 (元: gray-400) */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
         }
 
-        /* 基本スタイル */
+        /* CSS変数を定義（カラーテーマ） */
+        :root {
+            --bg-color-light: #F3F4F6; /* 明るい背景色 */
+            --text-color-light: #1F2937; /* 明るい文字色 */
+            --logo-color-light: #9CA3AF; /* 明るいロゴ色 */
+            --footer-text-color-light: #6B7281; /* 明るいフッター文字色 */
+
+            --bg-color-dark: #111827; /* 暗い背景色 */
+            --text-color-dark: #E5E7EB; /* 暗い文字色 */
+            --logo-color-dark: #4B5563; /* 暗いロゴ色 */
+            --footer-text-color-dark: #9CA3AF; /* 暗いフッター文字色 */
+        }
+
+        /* --- 基本スタイル --- */
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            flex-direction: column; /* 要素を縦に並べる */
+            min-height: 100vh; /* 画面の高さいっぱいに表示 */
+            
+            /* デフォルトはライトモードの色を適用 */
             background-color: var(--bg-color-light);
             color: var(--text-color-light);
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* ダークモードの設定 */
+        /* --- ダークモードの設定 --- */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: var(--bg-color-dark);
@@ -47,31 +55,31 @@
             }
         }
 
-        /* レイアウト */
+        /* --- レイアウト --- */
         .main-content {
-            flex-grow: 1;
+            flex-grow: 1; /* この要素が残りのスペースをすべて埋める */
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
+            align-items: center; /* 垂直方向の中央揃え */
+            justify-content: center; /* 水平方向の中央揃え */
+            padding: 2rem; /* 32pxの余白 */
         }
 
         .footer {
             width: 100%;
-            padding: 1.5rem;
+            padding: 1.5rem; /* 24pxの余白 */
             text-align: center;
         }
 
-        /* コンポーネント */
+        /* --- コンポーネント --- */
         .logo-container {
-            width: 66.66%;
-            max-width: 24rem;
+            width: 66.66%; /* 横幅を親要素の約2/3に */
+            max-width: 24rem; /* 最大幅を384pxに */
             color: var(--logo-color-light);
             transition: color 0.3s;
         }
 
         .copyright {
-            font-size: 0.875rem;
+            font-size: 0.875rem; /* 14pxの文字サイズ */
             color: var(--footer-text-color-light);
             transition: color 0.3s;
         }
