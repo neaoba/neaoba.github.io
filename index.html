@@ -3,16 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Google FontsからInterフォントを読み込み -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- ↓ブラウザのタブに表示されるタイトルです。ご自身の名前に変更してください。 -->
+
     <title>Your Name - Portfolio</title>
 
     <style>
-        /* CSS変数を定義（カラーテーマ） */
+        /* カラーテーマ */
         :root {
             --bg-color-light: #F3F4F6; /* 明るい背景色 (元: gray-100) */
             --text-color-light: #1F2937; /* 明るい文字色 (元: gray-800) */
@@ -25,22 +20,20 @@
             --footer-text-color-dark: #9CA3AF; /* 暗いフッター文字色 (元: gray-400) */
         }
 
-        /* --- 基本スタイル --- */
+        /* 基本スタイル */
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column; /* 要素を縦に並べる */
-            min-height: 100vh; /* 画面の高さいっぱいに表示 */
-            
-            /* デフォルトはライトモードの色を適用 */
+            flex-direction: column;
+            min-height: 100vh;
             background-color: var(--bg-color-light);
             color: var(--text-color-light);
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* --- ダークモードの設定 --- */
+        /* ダークモードの設定 */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: var(--bg-color-dark);
@@ -54,31 +47,31 @@
             }
         }
 
-        /* --- レイアウト --- */
+        /* レイアウト */
         .main-content {
-            flex-grow: 1; /* この要素が残りのスペースをすべて埋める */
+            flex-grow: 1;
             display: flex;
-            align-items: center; /* 垂直方向の中央揃え */
-            justify-content: center; /* 水平方向の中央揃え */
-            padding: 2rem; /* 32pxの余白 */
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
         }
 
         .footer {
             width: 100%;
-            padding: 1.5rem; /* 24pxの余白 */
+            padding: 1.5rem;
             text-align: center;
         }
 
-        /* --- コンポーネント --- */
+        /* コンポーネント */
         .logo-container {
-            width: 66.66%; /* 横幅を親要素の約2/3に */
-            max-width: 24rem; /* 最大幅を384pxに */
+            width: 66.66%;
+            max-width: 24rem;
             color: var(--logo-color-light);
             transition: color 0.3s;
         }
 
         .copyright {
-            font-size: 0.875rem; /* 14pxの文字サイズ */
+            font-size: 0.875rem;
             color: var(--footer-text-color-light);
             transition: color 0.3s;
         }
@@ -86,10 +79,8 @@
 </head>
 <body>
 
-    <!-- メインコンテンツエリア -->
     <main class="main-content">
         <div class="logo-container">
-            <!-- ↓ここにあなたのロゴ(SVG)を貼り付けてください。 -->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="currentColor">
                 <path d="M100 0C44.77 0 0 44.77 0 100s44.77 100 100 100 100-44.77 100-100S155.23 0 100 0zm0 180c-44.11 0-80-35.89-80-80s35.89-80 80-80 80 35.89 80 80-35.89 80-80 80z"/>
                 <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="24" font-family="Inter, sans-serif" fill="currentColor" style="font-weight: bold;">LOGO</text>
@@ -97,9 +88,7 @@
         </div>
     </main>
 
-    <!-- フッターエリア -->
     <footer class="footer">
-        <!-- ↓"Your Name"をご自身の名前に変更してください -->
         <p class="copyright">&copy; 2025 Your Name</p>
     </footer>
 
