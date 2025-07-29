@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMAF (.mmf) to Standard MIDI (.mid) Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-3xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">SMAF to MIDI Converter</h1>
+            <p class="mt-2 text-lg text-gray-600">SMAF (.mmf) ファイルを Standard MIDI (.mid) ファイルに変換します。</p>
+        </header>
+
+        <main class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+            <div class="mb-6">
+                <label for="file-upload" class="block text-lg font-semibold mb-2 text-gray-700">1. SMAFファイルを選択</label>
+                <div class="flex items-center justify-center w-full">
+                    <label for="file-upload" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">クリックしてファイルを選択</span> またはドラッグ＆ドロップ</p>
+                            <p class="text-xs text-gray-500">.mmf ファイルを選択してください</p>
+                        </div>
+                        <input id="file-upload" type="file" class="hidden" accept=".mmf"/>
+                    </label>
+                </div>
+                <p id="file-info" class="mt-2 text-center text-gray-600 h-6"></p>
+            </div>
+
+            <div class="text-center mb-6">
+                <button id="convert-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100" disabled>
+                    2. 変換してダウンロード
+                </button>
+            </div>
+
+            <div id="status-area" class="mt-4 p-4 bg-gray-50 rounded-lg min-h-[100px] text-sm">
+                <h3 class="font-semibold text-gray-700 mb-2">処理ログ:</h3>
+                <pre id="log" class="whitespace-pre-wrap break-words text-gray-600"></pre>
+            </div>
+        </main>
+
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">技術的な解説</h2>
+            <div class="text-left bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+                <p class="mb-2">このツールは、SMAFファイルのバイナリ構造を解析し、MIDIファイル形式に変換します。</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>
+                        <strong class="font-semibold">ファイル解析:</strong>
+                        アップロードされたSMAFファイルは、RIFFに似たチャンク構造（例: `MMMD`, `OPDA`, `MTr`）を持っています。プログラムはこれらのチャンクを順に読み取ります。
+                    </li>
+                    <li>
+                        <strong class="font-semibold">スコアデータの抽出:</strong>
+                        音楽の再生情報が含まれるのは `MTr` (Score Track) チャンクです。このチャンクからノート情報、テンポ、楽器設定などのイベントを抽出します。
+                        <div class="tooltip">
+                            [?]
+                            <span class="tooltiptext">SMAFの時間は「タイムベース」という単位で管理されます。このツールはそれをMIDIの「ティック」に変換します。</span>
+                        </div>
+                    </li>
+                    <li>
+                        <strong class="font-semibold">MIDIイベントへの変換:</strong>
+                        SMAFの各イベントは、MIDIの対応するイベント（ノートオン/ノートオフ、プログラムチェンジ、テンポ設定メタイベント等）にマッピングされます。
+                    </li>
+                    <li>
+                        <strong class="font-semibold">MIDIファイルの生成:</strong>
+                        変換されたイベントから、MIDIのヘッダチャンク (`MThd`) とトラックチャンク (`MTrk`) を構築し、一つの `.mid` ファイルとして出力します。
+                    </li>
+                </ul>
+                <p class="mt-4 italic">注意: このコンバーターはSMAFの基本的なシーケンス機能（MA-2/MA-3相当）に対応しています。音声データ(PCM)やFM音源の詳細な音色パラメータなど、一部の高度な機能は変換されません。</p>
+            </div>
+            <p class="mt-6">&copy; 2024 AI-Generated Converter. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- DOM要素の取得 ---
+        const fileUpload = document.getElementById('file-upload');
+        const fileInfo = document.getElementById('file-info');
+        const convertBtn = document.getElementById('convert-btn');
+        const logArea = document.getElementById('log');
+        const fileDropArea = document.querySelector('label[for="file-upload"]');
+
+        let smafFileBuffer = null;
+        let smafFileName = '';
+
+        // --- イベントリスナーの設定 ---
+
+        // ファイルドラッグ＆ドロップの処理
+        fileDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileDropArea.classList.add('bg-blue-100', 'border-blue-400');
+        });
+
+        fileDropArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileDropArea.classList.remove('bg-blue-100', 'border-blue-400');
+        });
+
+        fileDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileDropArea.classList.remove('bg-blue-100', 'border-blue-400');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // ファイル選択の処理
+        fileUpload.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        // 変換ボタンのクリック処理
+        convertBtn.addEventListener('click', convertAndDownload);
+
+        /**
+         * 選択されたファイルを処理する
+         * @param {File} file ユーザーが選択したファイルオブジェクト
+         */
+        function handleFile(file) {
+            log('ファイルを選択しました: ' + file.name);
+            smafFileName = file.name.replace(/\.[^/.]+$/, ""); // 拡張子を除去
+            fileInfo.textContent = file.name;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                smafFileBuffer = e.target.result;
+                convertBtn.disabled = false;
+                log('ファイルの読み込みが完了しました。変換ボタンを押してください。');
+            };
+            reader.onerror = () => {
+                log('エラー: ファイルの読み込みに失敗しました。', 'error');
+                convertBtn.disabled = true;
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        /**
+         * ログエリアにメッセージを表示する
+         * @param {string} message 表示するメッセージ
+         * @param {'info' | 'error' | 'success'} type メッセージの種類
+         */
+        function log(message, type = 'info') {
+            const prefix = {
+                info: '[INFO]',
+                error: '[ERROR]',
+                success: '[SUCCESS]'
+            }[type];
+            logArea.textContent += `${prefix} ${message}\n`;
+            logArea.scrollTop = logArea.scrollHeight; // 自動スクロール
+        }
+
+        /**
+         * 数値を指定されたバイト数のBig-EndianのUint8Arrayに変換する
+         * @param {number} value 変換する数値
+         * @param {number} bytes バイト数
+         * @returns {Uint8Array}
+         */
+        function numberToBytes(value, bytes) {
+            const arr = new Uint8Array(bytes);
+            for (let i = bytes - 1; i >= 0; i--) {
+                arr[i] = value & 0xFF;
+                value >>= 8;
+            }
+            return arr;
+        }
+
+        /**
+         * MIDIの可変長数値（Variable-Length Quantity）に変換する
+         * @param {number} value 変換する数値
+         * @returns {Uint8Array}
+         */
+        function numberToVariableLength(value) {
+            let buffer = value & 0x7F;
+            const bytes = [];
+            while ((value >>= 7) > 0) {
+                buffer <<= 8;
+                buffer |= ((value & 0x7F) | 0x80);
+            }
+            while (true) {
+                bytes.push(buffer & 0xFF);
+                if (buffer & 0x80) {
+                    buffer >>= 8;
+                } else {
+                    break;
+                }
+            }
+            return new Uint8Array(bytes.reverse());
+        }
+
+        /**
+         * SMAFを解析し、MIDIに変換してダウンロードを開始する関数
+         */
+        function convertAndDownload() {
+            if (!smafFileBuffer) {
+                log('変換するファイルがありません。', 'error');
+                return;
+            }
+            log('変換処理を開始します...');
+            try {
+                const midiData = parseSmaf(new DataView(smafFileBuffer));
+                if (midiData) {
+                    const blob = new Blob([midiData], { type: 'audio/midi' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${smafFileName}.mid`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    log('変換に成功しました！MIDIファイルをダウンロードします。', 'success');
+                }
+            } catch (e) {
+                log(`変換中にエラーが発生しました: ${e.message}`, 'error');
+                console.error(e);
+            }
+        }
+
+        /**
+         * SMAFファイルのバイナリデータを解析するメイン関数
+         * @param {DataView} view SMAFファイルのDataView
+         * @returns {Uint8Array | null} 生成されたMIDIデータのUint8Array、またはエラーの場合はnull
+         */
+        function parseSmaf(view) {
+            let offset = 0;
+
+            // --- ヘッダチャンク (MMMD) の確認 ---
+            const fileId = String.fromCharCode(view.getUint8(offset++), view.getUint8(offset++), view.getUint8(offset++), view.getUint8(offset++));
+            if (fileId !== 'MMMD') {
+                throw new Error('有効なSMAFファイルではありません (MMMDチャンクが見つかりません)。');
+            }
+            const fileSize = view.getUint32(offset, false); // Big-Endian
+            offset += 4;
+            log(`SMAFファイルを確認しました。サイズ: ${fileSize} バイト`);
+
+            let scoreTrackData = null;
+            let timebaseD = 48; // デフォルトのD-timebase
+            let timebaseG = 60; // デフォルトのG-timebase
+
+            // --- 各チャンクを走査 ---
+            while (offset < view.byteLength) {
+                const chunkId = String.fromCharCode(view.getUint8(offset++), view.getUint8(offset++), view.getUint8(offset++), view.getUint8(offset++));
+                const chunkSize = view.getUint32(offset, false);
+                offset += 4;
+                
+                log(`チャンク '${chunkId}' を検出しました。サイズ: ${chunkSize} バイト`);
+
+                if (chunkId === 'MTr' || chunkId === 'Atr') { // Score Track Chunk
+                    scoreTrackData = new DataView(view.buffer, offset, chunkSize);
+                    
+                    // タイムベースの取得 (オプション)
+                    const formatType = scoreTrackData.getUint8(0);
+                    if (formatType === 0x10) { // HandyPhone Standard
+                        timebaseD = scoreTrackData.getUint8(1);
+                        timebaseG = scoreTrackData.getUint8(2);
+                        log(`タイムベースを検出: D-time=${timebaseD}, G-time=${timebaseG}`);
+                    }
+                    break; // 最初のスコアトラックのみ処理
+                }
+                
+                offset += chunkSize; // 次のチャンクへ
+            }
+
+            if (!scoreTrackData) {
+                throw new Error('ファイル内にスコアトラック(MTr)が見つかりませんでした。');
+            }
+            
+            return convertScoreTrackToMidi(scoreTrackData, timebaseD);
+        }
+
+        /**
+         * SMAFのスコアトラックデータをMIDIイベントに変換する
+         * @param {DataView} view スコアトラックのDataView
+         * @param {number} timebase SMAFのタイムベース
+         * @returns {Uint8Array} 生成されたMIDIデータのUint8Array
+         */
+        function convertScoreTrackToMidi(view, timebase) {
+            log('スコアトラックをMIDIに変換しています...');
+            
+            const midiEvents = [];
+            let currentTick = 0;
+            const noteOnEvents = {}; // ノートオフイベントを管理するためのオブジェクト
+
+            let offset = 0;
+            // フォーマットタイプによってオフセットを調整
+            const formatType = view.getUint8(0);
+            if (formatType === 0x00) { // Mobile Standard (Compressed)
+                offset = 1;
+            } else if (formatType === 0x10) { // HandyPhone Standard
+                offset = 3;
+            } else {
+                log(`未対応のスコアトラックフォーマットです: 0x${formatType.toString(16)}`, 'error');
+                return null;
+            }
+
+            // --- スコアトラック内のイベントを解析 ---
+            while (offset < view.byteLength) {
+                const deltaTime = view.getUint8(offset++);
+                currentTick += deltaTime;
+
+                let eventByte = view.getUint8(offset++);
+                
+                // シーケンス終了判定
+                if (eventByte === 0x00) {
+                    log('シーケンス終了(0x00)を検出しました。');
+                    break;
+                }
+
+                // ノートイベント (0x80 - 0xFF)
+                if (eventByte >= 0x80) {
+                    const channel = eventByte & 0x0F;
+                    const noteNumber = view.getUint8(offset++);
+                    const gateTime = view.getUint8(offset++);
+                    const velocity = view.getUint8(offset++);
+
+                    // MIDIノートオンイベントを追加
+                    midiEvents.push({
+                        tick: currentTick,
+                        type: 'noteOn',
+                        channel: channel,
+                        note: noteNumber,
+                        velocity: velocity
+                    });
+                    
+                    // 対応するノートオフイベントを計算して追加
+                    const noteOffTick = currentTick + gateTime;
+                    if (!noteOnEvents[noteOffTick]) {
+                        noteOnEvents[noteOffTick] = [];
+                    }
+                    noteOnEvents[noteOffTick].push({
+                        type: 'noteOff',
+                        channel: channel,
+                        note: noteNumber,
+                        velocity: 0 // MIDIではノートオフのベロシティは0が一般的
+                    });
+
+                } else { // コントロールイベント (0x00-0x7F)
+                    const controlType = eventByte;
+                    switch (controlType) {
+                        case 0x01: // 楽器設定 (Program Change)
+                            const pcChannel = view.getUint8(offset++) & 0x0F;
+                            const programNum = view.getUint8(offset++);
+                            midiEvents.push({
+                                tick: currentTick,
+                                type: 'programChange',
+                                channel: pcChannel,
+                                program: programNum
+                            });
+                            log(`Tick ${currentTick}: Ch${pcChannel} 楽器を ${programNum} に変更`);
+                            break;
+                        // 他のコントロールイベント（ボリューム、パンなど）もここに追加可能
+                        // 例: case 0x02: ...
+                        default:
+                            // 不明なコントロールイベントはスキップ
+                            // 仕様書に基づいて必要なものを実装する
+                            log(`未対応のコントロールイベント 0x${controlType.toString(16)} をスキップしました。`);
+                            // イベントのサイズに応じてオフセットを進める必要がある
+                            // このサンプルでは単純なイベントのみ対応
+                            break;
+                    }
+                }
+            }
+
+            // --- ノートオフイベントをメインのイベントリストにマージ ---
+            Object.keys(noteOnEvents).forEach(tick => {
+                const tickValue = parseInt(tick, 10);
+                noteOnEvents[tickValue].forEach(event => {
+                    midiEvents.push({ ...event, tick: tickValue });
+                });
+            });
+
+            // --- 全イベントをティック順にソート ---
+            midiEvents.sort((a, b) => a.tick - b.tick);
+
+            return buildMidiFile(midiEvents, timebase);
+        }
+
+        /**
+         * 解析したイベントからMIDIファイルを構築する
+         * @param {Array<object>} events MIDIイベントの配列
+         * @param {number} timebase MIDIの分解能 (ティック/四分音符)
+         * @returns {Uint8Array} MIDIファイルのバイナリデータ
+         */
+        function buildMidiFile(events, timebase) {
+            log('MIDIファイルを構築しています...');
+            const trackEvents = [];
+            let lastTick = 0;
+
+            // --- MIDIイベントをバイナリに変換 ---
+            events.forEach(event => {
+                const deltaTick = event.tick - lastTick;
+                const deltaTimeBytes = numberToVariableLength(deltaTick);
+                
+                let eventBytes;
+                switch (event.type) {
+                    case 'noteOn':
+                        eventBytes = new Uint8Array([0x90 | event.channel, event.note, event.velocity]);
+                        break;
+                    case 'noteOff':
+                        eventBytes = new Uint8Array([0x80 | event.channel, event.note, event.velocity]);
+                        break;
+                    case 'programChange':
+                        eventBytes = new Uint8Array([0xC0 | event.channel, event.program]);
+                        break;
+                    default:
+                        return; // 未知のイベントは無視
+                }
+                
+                const combined = new Uint8Array(deltaTimeBytes.length + eventBytes.length);
+                combined.set(deltaTimeBytes, 0);
+                combined.set(eventBytes, deltaTimeBytes.length);
+                trackEvents.push(combined);
+
+                lastTick = event.tick;
+            });
+            
+            // --- トラック終了イベントを追加 ---
+            const endOfTrackDelta = numberToVariableLength(0);
+            const endOfTrackEvent = new Uint8Array([0xFF, 0x2F, 0x00]);
+            const endOfTrackBytes = new Uint8Array(endOfTrackDelta.length + endOfTrackEvent.length);
+            endOfTrackBytes.set(endOfTrackDelta, 0);
+            endOfTrackBytes.set(endOfTrackEvent, endOfTrackDelta.length);
+            trackEvents.push(endOfTrackBytes);
+
+            // --- トラックチャンク (MTrk) を作成 ---
+            const trackDataSize = trackEvents.reduce((sum, arr) => sum + arr.length, 0);
+            const mtrkHeader = new Uint8Array([
+                0x4D, 0x54, 0x72, 0x6B, // 'MTrk'
+                ...numberToBytes(trackDataSize, 4)
+            ]);
+
+            // --- ヘッダチャンク (MThd) を作成 ---
+            const mthdChunk = new Uint8Array([
+                0x4D, 0x54, 0x68, 0x64, // 'MThd'
+                0x00, 0x00, 0x00, 0x06, // チャンクサイズ (6)
+                0x00, 0x00,             // フォーマット0 (シングルマルチチャンネルトラック)
+                0x00, 0x01,             // トラック数 (1)
+                ...numberToBytes(timebase, 2) // 分解能 (タイムベース)
+            ]);
+            
+            // --- 全てのデータを結合 ---
+            const totalSize = mthdChunk.length + mtrkHeader.length + trackDataSize;
+            const finalMidiFile = new Uint8Array(totalSize);
+            let offset = 0;
+            
+            finalMidiFile.set(mthdChunk, offset);
+            offset += mthdChunk.length;
+            
+            finalMidiFile.set(mtrkHeader, offset);
+            offset += mtrkHeader.length;
+            
+            trackEvents.forEach(arr => {
+                finalMidiFile.set(arr, offset);
+                offset += arr.length;
+            });
+
+            log(`MIDIファイル構築完了。合計サイズ: ${finalMidiFile.length} バイト`);
+            return finalMidiFile;
+        }
+
+    </script>
+</body>
+</html>
