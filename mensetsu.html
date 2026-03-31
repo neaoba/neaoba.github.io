@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>面接キーワードカード</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(145deg, #0a0f1a 0%, #111827 50%, #0a0f1a 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+    color: #e2e8f0;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .header-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #4a5568;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .header-count {
+    font-size: 13px;
+    color: #64748b;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .progress-track {
+    width: 100%;
+    max-width: 480px;
+    height: 2px;
+    background: #1e293b;
+    border-radius: 1px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4a9bd9, #7b5ea7);
+    border-radius: 1px;
+    transition: width 0.4s ease;
+  }
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    min-height: 360px;
+    perspective: 1000px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  .card-inner {
+    width: 100%;
+    min-height: 360px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute;
+    width: 100%;
+    min-height: 360px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: linear-gradient(135deg, #141c2e 0%, #1a2540 100%);
+    border-radius: 16px;
+    border: 1px solid #253352;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .card-front {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 32px;
+  }
+  .card-front .number {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #4a6fa5;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .card-front .title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #e2e8f0;
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+  .card-front .hint {
+    font-size: 12px;
+    color: #4a5568;
+    letter-spacing: 1px;
+  }
+  .card-back {
+    transform: rotateY(180deg);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card-back .back-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .prep-item {
+    border-radius: 10px;
+    padding: 12px 16px;
+    border-left: 3px solid;
+  }
+  .prep-item .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .prep-item .value {
+    font-size: 13px;
+    line-height: 1.7;
+    font-weight: 400;
+  }
+  .prep-P  { background: #1a3a5c; border-left-color: #4a9bd9; }
+  .prep-P .label  { color: #4a9bd9; }
+  .prep-P .value  { color: #7eb8e0; }
+  .prep-R  { background: #3a2a1a; border-left-color: #b8860b; }
+  .prep-R .label  { color: #b8860b; }
+  .prep-R .value  { color: #d4a96a; }
+  .prep-E  { background: #1a3a2a; border-left-color: #2e8b57; }
+  .prep-E .label  { color: #2e8b57; }
+  .prep-E .value  { color: #6abf8a; }
+  .prep-P2 { background: #2a1a3a; border-left-color: #7b5ea7; }
+  .prep-P2 .label { color: #7b5ea7; }
+  .prep-P2 .value { color: #a68ad4; }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 4px;
+  }
+  .nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid #253352;
+    background: #1a2540;
+    color: #7eb8e0;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+  }
+  .nav-btn:disabled {
+    background: transparent;
+    color: #2a3550;
+    cursor: default;
+  }
+  .dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 280px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: #253352;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .dot.active {
+    width: 18px;
+    background: linear-gradient(90deg, #4a9bd9, #7b5ea7);
+  }
+  .footer-hint {
+    font-size: 11px;
+    color: #334155;
+    margin-top: 16px;
+    text-align: center;
+  }
+  /* Keyboard shortcut hint */
+  .kbd-hint {
+    font-size: 10px;
+    color: #253352;
+    margin-top: 8px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header-label">面接キーワードカード</div>
+<div class="header-count" id="counter">1 / 22</div>
+
+<div class="progress-track">
+  <div class="progress-fill" id="progress"></div>
+</div>
+
+<div class="card-container" id="cardContainer">
+  <div class="card-inner" id="cardInner">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" onclick="goPrev()">←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="nextBtn" onclick="goNext()">→</button>
+</div>
+
+<div class="footer-hint">タップ or スペースでめくる ／ ←→ でページ送り</div>
+<div class="kbd-hint">キーボード：← → Space</div>
+
+<script>
+const cards = [
+  { title: "ガクチカ（学業系）", keywords: { P: "経営史ゼミ／グループ研究／リーダー", R: "危機→好機の企業分析／共通要因", E: "資料膨大で苦戦 → 3軸整理＋担当割振り → 週1共有 → 教授高評価", P2: "チームワークで個人を超える成果 → 貴社で活かす" }},
+  { title: "学校で学んだこと", keywords: { P: "分析力＋課題解決力", R: "日本経営史専攻／歴史的視点で企業を読み解く", E: "卒論＝外資小売の日本参入比較 ／ ゼミ＝危機→好機のグループ研究", P2: "分析力と課題解決力を活かしたい" }},
+  { title: "自己PR・強み", keywords: { P: "未知でも自ら学び実践につなげる力", R: "パン屋バイト／商品知識不足で悔しさ", E: "全商品の原材料・製法を独学 → 好み・売れ筋を観察 → 提案パターン構築 → リピート増", P2: "主体的に学び成果を出す → 今後も知識吸収で貢献" }},
+  { title: "趣味・特技", keywords: { P: "野球観戦＋速読", R: "守備連携・配球の駆け引き・一体感 ／ 幅広い知識吸収", E: "球場観戦・リプレイ確認 ／ 専門書＋歴史・科学の書籍", P2: "多くの知識を吸収することを心がけている" }},
+  { title: "ガクチカ（ITパスポート）", keywords: { P: "経営×ITを結びつけるためITパスポート取得", R: "経営とIT密接 → 両方の知識が不可欠", E: "ストラテジ＝スムーズ ／ PM＝苦戦 → YouTube＋図解ノートで克服", P2: "未知分野も主体的にキャッチアップ → 基本情報に挑戦中" }},
+  { title: "金融に興味を持った理由", keywords: { P: "金融＝企業経営の根幹を支える存在", R: "経営史で資金調達・財務戦略の重要性を実感", E: "ゼミ＝再建の鍵が金融支援 ／ 卒論＝資金計画が成否を分けた", P2: "金融の側から企業・社会を支えたい" }},
+  { title: "ITに興味を持った理由", keywords: { P: "IT＝経営戦略の基盤 → ITで経営課題を解決したい", R: "経営史の学び → 経営×ITを体系化したい", E: "ITパスポート → ITは効率化ツール以上 → ストラテジで経営とIT不可分と理解", P2: "IT×経営課題解決 → 基本情報に挑戦中" }},
+  { title: "キャリアビジョン", keywords: { P: "SE → PM ／ ITから経営課題を解決", R: "経営を学ぶ側→支える側で理解を深めたい", E: "まずSEで技術力＋業務知識 → PMでチーム統括＋提案", P2: "技術とビジネスの橋渡し役" }},
+  { title: "長所", keywords: { P: "俯瞰して情報を整理する力", R: "研究・論文で複数情報の全体像把握が必要だった", E: "議論拡散 → 比較軸3つに絞り＋担当明確化 → 卒論でも活用", P2: "俯瞰的な整理力が強み" }},
+  { title: "短所", keywords: { P: "一人で抱え込みやすい", R: "責任感 → 自分で解決しようとし相談が遅れる", E: "ゼミで取りまとめを一人で進め → メンバーと認識ずれ", P2: "【改善】早い段階で周囲に共有するよう意識" }},
+  { title: "卒論テーマ", keywords: { P: "外資小売の日本参入／成功と苦戦の比較分析", R: "現地適応度が成否を分ける", E: "複数企業の参入戦略 ／ 有報・業界統計・報道記事 → 横断比較", P2: "事実にもとづき筋道立てて考える力が鍛えられた" }},
+  { title: "大学・学部の選択理由", keywords: { P: "経営判断・経済への関心を学問で深めたい → 経済学部", R: "高校時代からニュースで企業の成功理由に興味", E: "入学後、日本経営史ゼミと出会い歴史的視点で学べている", P2: "自分の興味に合った学び" }},
+  { title: "意見が対立した時", keywords: { P: "相手を理解 → 根拠を示し → より良い結論を一緒に探す", R: "前提が違うだけでどちらにも理がある", E: "ゼミで切り口の意見が分かれる → 視点整理 → 新しい比較軸発見 → 質向上", P2: "意見の違い＝より良い答えの材料" }},
+  { title: "志望動機（りそなテ）", keywords: { P: "金融の最前線からITで経営課題解決", R: "経営史で金融の重要性 ＋ ITパスポートでIT＝経営基盤", E: "御社＝グループ金融のシステム一手に担う → ユーザー近い環境", P2: "SE → PM ／ 現場が本当に必要とするシステムを提案" }},
+  { title: "志望動機（SIer）", keywords: { P: "幅広い業界にITで経営課題解決", R: "経営史で仕組みづくりの重要性 ＋ ITパスポートでIT＝経営基盤", E: "御社＝多業界のシステム開発 → 技術力＋業務知識を幅広く", P2: "SE → PM ／ 最適なシステム提案・推進" }},
+  { title: "友人からの評価", keywords: { P: "「頼まれてないことまでやる人」", R: "全体を見て自分にできることを見つけて動く", E: "ゼミ＝資料探し手伝い・論点整理 ／ パン屋＝担当外の知識まで習得", P2: "全体を見て動く姿勢が持ち味" }},
+  { title: "感謝されたエピソード", keywords: { P: "「あなたに選んでもらうと間違いない」", R: "主体的に学んだことが相手の役に立った", E: "知識不足 → 全商品調査＋好み観察 → 一人ひとりに提案 → 常連から感謝", P2: "相手の期待を超える準備を続けたい" }},
+  { title: "苦手なタイプ", keywords: { P: "理由なしに結論を押し通す人", R: "ただし背景に何らかの考えがあるはず", E: "ゼミで背景を聞いたら自分にない視点が含まれていた", P2: "距離を取らず自分から歩み寄る" }},
+  { title: "集団の役割", keywords: { P: "方向性を整理する役割が多い", R: "固定役割より、チームに必要な動きを考える", E: "リーダー時＝割振り＋進捗共有 ／ 他にリーダーいれば＝議論整理・意見引き出し", P2: "その場に必要な役割を見極めて動く" }},
+  { title: "最大のチャレンジ", keywords: { P: "経営危機を乗り越えた企業に直接話を聞きに行った", R: "文献だけでは危機の実感が掴めなかった", E: "自ら連絡 → 不安あり → 趣旨を丁寧に説明 → 快諾 → 現場の判断・葛藤を知れた → 教授高評価", P2: "必要なことには臆せず踏み出す" }},
+  { title: "挫折経験", keywords: { P: "高校の弁論大会で練習通りにできなかった", R: "人前で伝えることに挑戦したくて自ら志願", E: "緊張で早口 → 原因＝暗記頼りで「伝える」意識不足 → 聞き手を見て練習 → 入賞は叶わず", P2: "原因分析→改善実行の姿勢が身についた" }},
+  { title: "就活の軸", keywords: { P: "3つの軸", R: "① ITで社会基盤を支える ② エンジニアとして成長 ③ 分析力・探究心を活かせる", E: "（面接で各軸にエピソードを補足）", P2: "3軸に合う企業で強みを活かし貢献" }},
+];
+
+const PREP_LABELS = { P: "結論", R: "理由", E: "具体例", P2: "まとめ" };
+
+let currentIndex = 0;
+let flipped = false;
+let touchStartX = null;
+
+function render() {
+  const card = cards[currentIndex];
+  const total = cards.length;
+
+  // Counter
+  document.getElementById("counter").textContent = `${currentIndex + 1} / ${total}`;
+
+  // Progress
+  document.getElementById("progress").style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+  // Front
+  document.getElementById("cardFront").innerHTML = `
+    <div class="number">#${String(currentIndex + 1).padStart(2, "0")}</div>
+    <div class="title">${card.title}</div>
+    <div class="hint">タップでキーワード表示</div>
+  `;
+
+  // Back
+  let backHTML = `<div class="back-title">${card.title}</div>`;
+  for (const [key, value] of Object.entries(card.keywords)) {
+    const displayKey = key === "P2" ? "P" : key;
+    backHTML += `
+      <div class="prep-item prep-${key}">
+        <div class="label">${displayKey}：${PREP_LABELS[key]}</div>
+        <div class="value">${value}</div>
+      </div>`;
+  }
+  document.getElementById("cardBack").innerHTML = backHTML;
+
+  // Flip state
+  document.getElementById("cardInner").classList.toggle("flipped", flipped);
+
+  // Buttons
+  document.getElementById("prevBtn").disabled = currentIndex === 0;
+  document.getElementById("nextBtn").disabled = currentIndex === total - 1;
+
+  // Dots
+  let dotsHTML = "";
+  for (let i = 0; i < total; i++) {
+    dotsHTML += `<div class="dot${i === currentIndex ? " active" : ""}" onclick="goTo(${i})"></div>`;
+  }
+  document.getElementById("dots").innerHTML = dotsHTML;
+}
+
+function flip() {
+  flipped = !flipped;
+  document.getElementById("cardInner").classList.toggle("flipped", flipped);
+}
+
+function goNext() {
+  if (currentIndex < cards.length - 1) {
+    flipped = false;
+    currentIndex++;
+    render();
+  }
+}
+
+function goPrev() {
+  if (currentIndex > 0) {
+    flipped = false;
+    currentIndex--;
+    render();
+  }
+}
+
+function goTo(i) {
+  flipped = false;
+  currentIndex = i;
+  render();
+}
+
+// Card click
+document.getElementById("cardContainer").addEventListener("click", flip);
+
+// Touch swipe
+document.getElementById("cardContainer").addEventListener("touchstart", function(e) {
+  touchStartX = e.touches[0].clientX;
+}, { passive: true });
+
+document.getElementById("cardContainer").addEventListener("touchend", function(e) {
+  if (touchStartX === null) return;
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (diff > 60) goNext();
+  else if (diff < -60) goPrev();
+  else flip();
+  touchStartX = null;
+  e.preventDefault();
+});
+
+// Keyboard
+document.addEventListener("keydown", function(e) {
+  if (e.key === "ArrowRight") goNext();
+  else if (e.key === "ArrowLeft") goPrev();
+  else if (e.key === " ") { e.preventDefault(); flip(); }
+});
+
+// Initial render
+render();
+</script>
+</body>
+</html>
