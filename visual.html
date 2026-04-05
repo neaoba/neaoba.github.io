@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMP風 サイケデリック・ウェーブ</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #controls {
+            position: absolute;
+            top: 20px;
+            background: rgba(10, 10, 10, 0.8);
+            padding: 15px 25px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input[type="file"] {
+            color: #ccc;
+        }
+        audio {
+            filter: invert(1) hue-rotate(180deg); /* プレイヤーを暗色系にする小技 */
+            opacity: 0.8;
+        }
+        canvas {
+            background-color: #000;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <label for="audioUpload">音楽ファイルを選択してください:</label>
+        <input type="file" id="audioUpload" accept="audio/*">
+        <audio id="audio" controls></audio>
+    </div>
+
+    <canvas id="visualizer"></canvas>
+
+    <script>
+        const canvas = document.getElementById('visualizer');
+        const ctx = canvas.getContext('2d');
+        const audio = document.getElementById('audio');
+        const fileInput = document.getElementById('audioUpload');
+
+        // ウィンドウサイズに合わせてキャンバスをリサイズ
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let audioCtx;
+        let analyser;
+        let source;
+        let hue = 0; // 色相を変化させるための変数
+        let phase = 0; // 波全体のうねりを加えるための変数
+        let objectUrl = null;
+
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            // メモリリークを防ぐため、古いURLがあれば解放する
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
+
+            objectUrl = URL.createObjectURL(file);
+            audio.src = objectUrl;
+            
+            // 自動再生を試みるが、エラーになった場合は握りつぶしてユーザーの操作を待つ
+            audio.play().catch(() => {
+                console.log("ブラウザの制限により自動再生がブロックされました。プレイヤーの再生ボタンを押してください。");
+            });
+        });
+
+        // 音楽が再生されたタイミング（ユーザーが再生ボタンを押した時など）に実行
+        audio.addEventListener('play', function() {
+            if (!audioCtx) {
+                setupAudio();
+            } else if (audioCtx.state === 'suspended') {
+                // ブラウザによって停止されていた場合は再開する
+                audioCtx.resume();
+            }
+        });
+
+        function setupAudio() {
+            // AudioContextの作成
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            
+            // オシロスコープ（時間領域データ）を取得するため、サイズを大きめに設定
+            analyser.fftSize = 2048;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            source = audioCtx.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+
+            drawVisualizer(bufferLength, dataArray);
+        }
+
+        function drawVisualizer(bufferLength, dataArray) {
+            requestAnimationFrame(() => drawVisualizer(bufferLength, dataArray));
+
+            // 周波数ではなく、波形データ（TimeDomainData）を取得する
+            analyser.getByteTimeDomainData(dataArray);
+
+            // 背景を半透明の黒で塗りつぶすことで、軌跡（残像）を残す
+            // 数値（0.15）を下げるほど残像が長く残る
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 色相を時間経過で変化させる
+            hue += 0.5;
+            if (hue > 360) hue = 0;
+
+            // 線のスタイル設定
+            ctx.lineWidth = 3;
+            // HSLを使って鮮やかなサイケデリックカラーに
+            ctx.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+            // 光るエフェクト
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+
+            ctx.beginPath();
+
+            const sliceWidth = canvas.width * 1.0 / bufferLength;
+            let x = 0;
+
+            // 波全体をゆっくり上下にうねらせるためのオフセット
+            phase += 0.02;
+
+            for (let i = 0; i < bufferLength; i++) {
+                // dataArrayの値は0〜255 (128が無音状態のセンター)
+                const v = dataArray[i] / 128.0;
+                
+                // キャンバスの高さに合わせて波の振幅を計算
+                // サイケデリック感を出すために、Sin波を足して全体のうねり（phase）を加える
+                const y = v * canvas.height / 2 + Math.sin(i * 0.05 + phase) * 50;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    // 滑らかに繋ぐためにbezierCurveToを使っても良いが、lineToでも十分うねる
+                    ctx.lineTo(x, y);
+                }
+
+                x += sliceWidth;
+            }
+
+            // 右端まで線を引く
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+
+            // シャドウをリセット（パフォーマンスのため）
+            ctx.shadowBlur = 0;
+            
+            // もう一本、逆位相の波を描画して複雑さを増す
+            drawSecondaryWave(bufferLength, dataArray, sliceWidth);
+        }
+
+        // さらにサイケデリックにするための2本目の波（少し色と動きを変える）
+        function drawSecondaryWave(bufferLength, dataArray, sliceWidth) {
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = `hsl(${(hue + 180) % 360}, 100%, 70%)`; // 補色を使う
+            ctx.beginPath();
+
+            let x = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                // データを反転（128を中心に逆向きに）させて振幅を少し変える
+                const v = (256 - dataArray[i]) / 128.0;
+                // 位相を逆にする
+                const y = v * canvas.height / 2 + Math.sin(i * 0.03 - phase) * 80;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+                x += sliceWidth;
+            }
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        }
+    </script>
+</body>
+</html>
