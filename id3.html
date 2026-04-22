@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ID最終面接対策 — 統合flashcard</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e0c;
+    --bg-elevated: #161411;
+    --bg-card: #1c1a16;
+    --bg-card-hover: #221f1a;
+    --border: #2d2822;
+    --border-strong: #3d372e;
+    --text: #ebe4d5;
+    --text-muted: #9a9285;
+    --text-dim: #6b6459;
+    --accent: #d4a574;
+    --accent-soft: #8c7a5c;
+    --accent-bg: rgba(212, 165, 116, 0.08);
+    --ink: #d4a574;
+    --serif: 'Noto Serif JP', serif;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', 'Noto Serif JP', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--serif);
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 400;
+    line-height: 1.75;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at top left, rgba(212, 165, 116, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(212, 165, 116, 0.03) 0%, transparent 50%);
+  }
+
+  #root { min-height: 100vh; }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 48px 0 36px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 80px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+  .title {
+    font-family: var(--serif);
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .title-sub {
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+  .meta {
+    display: flex;
+    gap: 32px;
+    margin-top: 28px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .meta span strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0 16px;
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within {
+    border-color: var(--accent-soft);
+  }
+  .search-bar svg {
+    flex-shrink: 0;
+    color: var(--text-dim);
+  }
+  .search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--serif);
+    font-size: 15px;
+    padding: 14px 12px;
+    letter-spacing: 0.02em;
+  }
+  .search-bar input::placeholder {
+    color: var(--text-dim);
+  }
+  .search-clear {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .search-clear:hover {
+    color: var(--text);
+    background: var(--bg-card);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+    margin-bottom: 32px;
+  }
+  .tab {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--serif);
+    font-size: 14px;
+    padding: 12px 18px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab-count {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+  .tab.active .tab-count { color: var(--accent-soft); }
+
+  /* Section header */
+  .section-intro {
+    font-family: var(--serif);
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.8;
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--accent-soft);
+  }
+
+  /* Card */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border-strong); }
+  .card.completed {
+    border-left: 2px solid var(--accent-soft);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 22px 26px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .card-index {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    padding-top: 4px;
+    min-width: 42px;
+  }
+  .card-q {
+    flex: 1;
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--text);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.55;
+  }
+  .card-q .q-label {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    margin-right: 10px;
+    vertical-align: 2px;
+  }
+  .check-btn {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-top: 2px;
+  }
+  .check-btn:hover { border-color: var(--accent-soft); }
+  .check-btn.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .check-btn.checked svg { color: var(--bg); }
+  .check-btn svg { width: 12px; height: 12px; color: transparent; transition: color 0.2s; }
+
+  .toggle-icon {
+    flex-shrink: 0;
+    color: var(--text-dim);
+    padding-top: 4px;
+    transition: transform 0.2s;
+  }
+  .card.open .toggle-icon { transform: rotate(90deg); color: var(--accent); }
+
+  .card-body {
+    padding: 0 26px 28px 84px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+  .card.open .card-body {
+    max-height: 6000px;
+    padding: 0 26px 32px 84px;
+  }
+
+  .body-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 20px 0 10px;
+    font-weight: 600;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .body-label:first-child { margin-top: 4px; }
+
+  .answer {
+    font-family: var(--serif);
+    font-size: 15px;
+    line-height: 1.95;
+    color: var(--text);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  .answer p { margin-bottom: 14px; }
+  .answer p:last-child { margin-bottom: 0; }
+  .answer strong { color: var(--accent); font-weight: 600; }
+
+  .design-note {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  .design-note ul { list-style: none; }
+  .design-note li {
+    padding-left: 18px;
+    position: relative;
+    margin-bottom: 6px;
+  }
+  .design-note li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--accent-soft);
+  }
+
+  .tag-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 9px;
+    border: 1px solid var(--border-strong);
+    border-radius: 2px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .tag.priority-high {
+    color: var(--accent);
+    border-color: var(--accent-soft);
+  }
+  .tag.priority-mid {
+    color: #b89968;
+    border-color: #5a4d36;
+  }
+  .tag.priority-low {
+    color: var(--text-dim);
+  }
+
+  .quote-block {
+    border-left: 2px solid var(--accent-soft);
+    padding: 10px 18px;
+    margin: 14px 0;
+    background: var(--accent-bg);
+    font-style: italic;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 14px;
+  }
+  .pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* Progress bar */
+  .progress {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    padding: 16px 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .progress-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .progress-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .progress-label strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .progress-track {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 80px;
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  /* Day-of section styling */
+  .dayof-card {
+    background: var(--bg-elevated);
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    border-left: 2px solid var(--accent);
+  }
+  .dayof-title {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+  .dayof-list {
+    list-style: none;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+  .dayof-list li {
+    padding-left: 22px;
+    position: relative;
+    margin-bottom: 5px;
+  }
+  .dayof-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent-soft);
+    font-family: var(--mono);
+  }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-muted);
+    font-family: var(--serif);
+  }
+  .empty .kicker {
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 700px) {
+    .container { padding: 0 20px; }
+    .title { font-size: 32px; }
+    .title-sub { font-size: 16px; }
+    .meta { flex-direction: column; gap: 6px; }
+    .card-head { padding: 18px 18px; gap: 12px; }
+    .card-index { min-width: 36px; font-size: 10px; }
+    .card-q { font-size: 15px; }
+    .card-body, .card.open .card-body { padding-left: 18px; padding-right: 18px; }
+    .tab { padding: 10px 12px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useMemo } = React;
+
+// ============ DATA ============
+const SECTIONS = [
+  {
+    id: 'core',
+    label: '志望系',
+    intro: '一次面接と一貫性を保ちつつ、新技術・多様な業界・チャレンジ文化の3軸で語る。金融一本推しは避け、IT業界志望理由(金融と物流への関心→すべての業界でITが使われている実感)を起点に、IDの多様な顧客業界と新技術への取り組みに接続する構造を徹底する。',
+    cards: [
+      {
+        id: 'c1',
+        q: 'IT業界を志望する理由',
+        priority: 'high',
+        prob: '必ず聞かれる',
+        tags: ['一次と同内容', '志望の起点'],
+        answer: [
+          '私はもともと、経済学を学んでいた関係で金融業界、そして子供の頃から関心のあった物流業界を中心に就職活動を進めていました。',
+          'しかし両方の業界を調べていく中で、どちらも基幹システムや業務効率化を通じて、ITが業界のあり方そのものを支え、変えていっている実態を知りました。一つの業界に閉じるよりも、様々な業界にITという形で関わっていくほうが、自分の関心に合っていると考え、IT業界を志望するに至りました。'
+        ],
+        design: [
+          '一次面接での発言と完全一致(金融と物流→ITのすべての業界で使われている→IT業界)',
+          'ゴトウさんが「色々と見たけれどもすべての業界でITが活用されているところを見てIT業界を選ばれたんですね」と確認した流れをそのまま使う',
+          'ID志望動機の前段としてそのまま繋げられる'
+        ]
+      },
+      {
+        id: 'c2',
+        q: 'ID志望動機(新版・金融軸外し)',
+        priority: 'high',
+        prob: '必ず聞かれる',
+        tags: ['新版', '多様性×新技術×社風'],
+        answer: [
+          '御社を志望する理由は、IT業界を見始めたきっかけと、御社が打ち出されている事業の進め方・社風の両方が強く一致しているためです。',
+          '(前段)私はもともと金融と物流を中心に業界を見ていましたが、どちらも基幹システムや業務効率化を通じてITが業界のあり方を変えていっている実態を知り、様々な業界にITという形で関わっていきたいと考え、IT業界を志望しました。',
+          '御社は、金融、インフラ、航空をはじめとする多様な事業分野を手掛けられており、「特定の業界に絞り切らず、幅広い業界で社会を支える仕事に携わりたい」という私の志向と非常に合っていると感じました。加えて、御社が推進されているDXやAIといった新しい領域への取り組みは、「ITが既存の業界を変えていく」という、私がIT業界に興味を持った最初の関心そのものに重なり、強く惹かれました。',
+          'もう一つ大きな理由として、御社の「それまでのキャリアがどうであれ、自分から手を挙げれば新しい分野に挑戦できる」という文化があります。私自身、文系・未経験からIT業界を志望するという、自分にとって一つのチャレンジをしているところですが、そうした学び直しや越境を歓迎してくださる社風は、実際に入社した後も自分の成長を後押ししてくれる環境だと感じています。幅広い事業分野があっても、そこに実際に自分が動いて関わっていけるかは、会社の文化によって変わると考えており、その点でも御社に最も強い魅力を感じました。',
+          '以上の理由から、多様な業界を支える御社のもとで、ITを通じて社会に幅広く影響を与えられる仕事に携わりたいと考え、志望しております。'
+        ],
+        design: [
+          '金融軸を意図的に外し「多様性×新技術」を主軸に(一次との整合性を保持)',
+          '「金融、インフラ、航空」はIDがPR TIMESで使う公式表現バリエーションと整合',
+          'チャレンジ文化への共感を「文系・未経験からの自分のチャレンジ」と接続',
+          '2〜3分で話せる長さに調整済み'
+        ]
+      },
+      {
+        id: 'c3',
+        q: '職種志望理由:なぜアプリケーション開発エンジニアか',
+        priority: 'high',
+        prob: '必ず聞かれる',
+        tags: ['パターンB', '分離型', '業界業務知識×技術'],
+        answer: [
+          'アプリケーション開発エンジニアを志望している理由は二つあります。',
+          '一つは、一次面接でもお話しした通り、下流の開発からお客様との要件定義を行う上流の部分まで、一貫してお客様に関われる点に魅力を感じているためです。',
+          'もう一つは、御社を志望するにあたって改めて考えた理由です。御社は金融、インフラ、航空といった多様な業界を手掛けられていますが、その中でもアプリケーション開発は、業界ごとの業務知識と最も密接に関わる領域だと考えています。私はもともと金融や物流といった業界を調べていく中で、ITがそれらの業界のあり方を変えていく姿に惹かれてIT業界を目指しました。業界の業務知識を深めながら技術を積み上げていけるアプリケーション開発という職種は、私が業界研究を通じてITに興味を持った経緯とも最も重なるため、この職種で御社に貢献していきたいと考えています。'
+        ],
+        design: [
+          '一次発言(下流から上流まで一貫)をそのまま踏襲して深化',
+          '「一次でもお話しした通り」で明示的に一次と接続',
+          'IDの事業(多様な業界)×職種(アプリ開発)×自分の原体験 の三者を結び付ける',
+          'エージェント指導の「職種単独で閉じずID全体と絡めて」を満たす'
+        ]
+      },
+      {
+        id: 'c4',
+        q: '入社後のキャリアプラン:5年後・10年後は?',
+        priority: 'high',
+        prob: '高確率',
+        tags: ['一次と同内容', 'エージェント承認済み'],
+        answer: [
+          '御社に入社いたしましたら、まずは開発業務や研修を通じて、プログラミングやシステム設計の技術を身につけるとともに、お客様の業務知識も一緒に深めていきたいと思います。',
+          'ITスキルを身につけた後は、お客様の課題にエンジニアとして直接向き合い信頼関係を築いていくとともに、その知見やノウハウをチームに還元していくことを意識したいと考えています。',
+          '将来的には、10年ほどを目安にエンジニアとして経験を積んでから、プロジェクトマネジメントの方向に進んでいきたいと考えております。'
+        ],
+        design: [
+          '一次発言をそのまま使用(エージェント評価「このまま問題なし」)',
+          '「1〜2年目はテスター/プログラマー」→「スキル習得後に信頼関係構築」→「10年でPM」の段階設計が評価されている',
+          '抽象的な「いずれPMに」ではなく段階を明示している点が強み'
+        ]
+      },
+      {
+        id: 'c5',
+        q: '入社後にどのようなポジションで働きたいか',
+        priority: 'high',
+        prob: '高確率',
+        tags: ['21年卒で回答詰まった質問', '業界深入り型'],
+        answer: [
+          '一次面接でもお話しした通り、アプリケーション開発エンジニアを第一志望にしています。',
+          '具体的にどのようなポジションで、という点については、最初の数年は下流の開発業務を通じて、プログラミングの技術と、御社のお客様の業界の業務知識を同時に身につけていきたいと考えています。御社は金融、エネルギー、運輸といった幅広い業界のお客様を抱えていらっしゃるので、まずはどこかの業界のお客様に深く入り込み、その業界の業務とシステムの両方を理解できる一人前のエンジニアを目指したいです。',
+          'その上で、経験を積んだ後は要件定義など上流の工程にも関わっていきたいと考えています。お客様の業務課題を直接伺って、それに合うシステムを提案し、下流の開発までつないでいく、こうした一貫した流れに携わりたいという思いが、アプリケーション開発エンジニアを選んだ元々の理由でもあります。その先では、10年ほどを一つの目安にプロジェクトマネジメントに進んでいきたいと考えています。'
+        ],
+        design: [
+          '21年卒の体験記で「どんなポジションで働きたいかに答えられなかった」という反省への明確な対策',
+          '「どこかの業界のお客様に深く入り込む」という具体像を提示',
+          'IDの公式顧客業界(金融・エネルギー・運輸)を入れて事業理解を示す',
+          'キャリアプランQ4との重複を避けつつ補完関係に'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'values',
+    label: '価値観',
+    intro: '価値観の深掘りは2段階構造で用意。1段目は抽象的な価値観を先に言語化し、2段目でGDエピソードを具体例として出す。エージェントの具体指導「手を挙げる文化への共感 → 学生時代の積極性 → GDのエピソード」の順序をそのまま実装。',
+    cards: [
+      {
+        id: 'v1',
+        q: 'あなたの価値観は / なぜチャレンジ文化に共感したのか【1段目】',
+        priority: 'high',
+        prob: '高確率',
+        tags: ['1段目', '抽象'],
+        answer: [
+          '私が大切にしている価値観は、「状況を見て、自分から動いた方が良いと判断したら、迷わず手を挙げる」という姿勢です。学生生活の中で、グループで何かに取り組む場面が何度もあったのですが、そのたびに感じたのは、場の流れを誰かが作らないと物事が止まってしまう、ということでした。そうした時に自分から動いて方向性を示すと、他のメンバーも安心して動きやすくなり、全体として良い結果に繋がるという経験を何度かしました。',
+          'そうした経験の積み重ねから、組織やチームの中で価値を生むのは、特別な能力や立場ではなく、まず自分から手を挙げる姿勢そのものだと考えるようになりました。御社が社風として掲げられている「キャリアがどうであれ、自分から手を挙げれば挑戦できる」という考え方は、私が大切にしているこの価値観と非常に近いものがあり、強い共感を覚えました。'
+        ],
+        design: [
+          '抽象的な価値観を先に言語化(具体例は2段目に温存)',
+          '「学生生活の中で何度も」と複数示唆して深掘り余地を残す',
+          '最後にIDの社風と接続(志望動機との一貫性)',
+          '約1分'
+        ]
+      },
+      {
+        id: 'v2',
+        q: '具体的にはどのような場面か / エピソードは【2段目】',
+        priority: 'high',
+        prob: '1段目の深掘りで確実',
+        tags: ['2段目', 'GDエピソード'],
+        answer: [
+          '特に印象に残っているのは、大学の講義でグループディスカッションを行った時のことです。複数人でテーマに沿って議論する形式だったのですが、初対面のメンバーが多かったこともあり、最初は誰も口火を切らず、場が沈黙してしまう状況がありました。このまま時間だけが過ぎてしまうと全員にとって良くないと感じたので、私から率先して議論の方向性の案を出し、「まずはこの切り口から話してみませんか」と場を動かしにかかりました。',
+          '結果として、そこから他のメンバーも発言しやすくなり、最終的には時間内に意見がまとまって発表までたどり着くことができました。この経験を通じて、自分から手を挙げる一歩が、その後の全体の動きを大きく変えるということを実感しました。特別なスキルや知識があったわけではなく、ただ「このままでは良くない」と判断して動いただけなのですが、それでも場を動かす力になり得るということを学び、以降も同じような場面では自分から動くことを意識するようになりました。'
+        ],
+        design: [
+          'エージェント指導のGD例をほぼ踏襲',
+          '場面→問題→行動→結果→学びの型で構造化',
+          '「特別なスキルがあったわけではない」という謙虚さで人物像を柔らかく',
+          'ゼミのグループ研究は一次のリーダーシップ経験で既出なので避け、GDを新規エピソードとして投入'
+        ]
+      },
+      {
+        id: 'v3',
+        q: '反対意見が出たらどう対応するか / GD以外にも同様の経験はあるか【3段目】',
+        priority: 'mid',
+        prob: 'さらに深掘りされた場合',
+        tags: ['3段目', '予備'],
+        answer: [
+          '(反対意見について)反発というよりは、むしろ「先に発言してくれて助かった」という空気を感じました。最初の一人が出ると場が動き出すというのは、こういうことなのだと実感しました。もし反対の意見が出ていた場合は、一次でもお話しした通り、相手の意見の根拠を必ず確認するようにしているので、その上でどこに共通点があるかを探っていったと思います。',
+          '(GD以外の経験について)はい。一つは、一次面接でもお話しした、ゼミのグループ研究でリーダーを務めた経験です。こちらは長期的な取り組みだったので、手を挙げるというよりは寄り添って進めるという形でしたが、根っこにある「自分から動いて場を作る」という意識は共通していたと思っています。もう一つは、パン屋のアルバイトで、繁忙期に自分の作業が追いつかなかった時に、先輩に指示を待つのではなく自分からメモを取って改善策を持ちかけるようにしたことです。'
+        ],
+        design: [
+          '一次のリーダーシップ経験と挫折経験を「価値観の裏付け」として再解釈',
+          '一次発言を繰り返すのではなく、価値観の文脈で意味づけし直す',
+          '断片的な一次発言が一本の軸で貫かれている印象を強化'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'interpersonal',
+    label: '対人関係',
+    intro: '21年卒の最終面接で実際に出題された対人関係の質問群。SEという職種はチームとお客様対応が中核なので、ここを落とすと職種との相性を疑われる。一次で既出のゼミ研究とパン屋のエピソードを別角度で再利用する構造。',
+    cards: [
+      {
+        id: 'i1',
+        q: 'モノづくりをするときはチームがいいか、一人がいいか',
+        priority: 'mid',
+        prob: '21年卒で出題',
+        tags: ['チーム派'],
+        answer: [
+          'チームで取り組むほうが自分に合っていると考えています。一人で進めると自分の視点だけで完結してしまいますが、チームで進めると、自分では気づかない観点や知見がメンバーから出てくるため、結果として質の高いアウトプットに繋がると感じています。',
+          '特に、ゼミのグループ研究でリーダーを務めた際、各メンバーが担当する企業について調べ、週1回集まって共有する仕組みを作ったところ、自分一人では到達できなかった視点がいくつも得られました。この経験から、チームで取り組む方が、自分自身にとっても全体にとっても良い結果が生まれると考えるようになりました。'
+        ],
+        design: [
+          'SEはチーム仕事が前提なので「チーム派」と答えるのが職種と整合',
+          '一次のゼミ研究エピソードを別角度(チームの価値)で再利用',
+          '抽象論ではなく自分の経験から理由を引き出す'
+        ]
+      },
+      {
+        id: 'i2',
+        q: 'なぜチームがいいのか',
+        priority: 'mid',
+        prob: 'i1の深掘り',
+        tags: ['深掘り'],
+        answer: [
+          '一つは、先ほど申し上げた通り、多様な視点が入ることで自分一人の限界を超えられるという点です。',
+          'もう一つは、自分が動くことで他のメンバーの動きも引き出せるという点で、これもゼミ研究の時に感じたことです。自分から一つ提案を出したり場の方向性を示すと、他のメンバーも自分なりの意見を出しやすくなり、結果として全員が関わる形で良い議論になっていきました。一人で取り組む場合にはないこうしたダイナミズムが、チームで動く魅力だと考えています。'
+        ],
+        design: [
+          'i1の繰り返しではなく、一段深い理由を追加',
+          '「自分が動くことで他の動きも引き出す」は価値観深掘り(v1)と同じ軸=質問横断で一貫性'
+        ]
+      },
+      {
+        id: 'i3',
+        q: '苦手なタイプの人とはどうやって付き合っていくのか',
+        priority: 'mid',
+        prob: '21年卒で出題',
+        tags: ['一次の発言を流用'],
+        answer: [
+          '苦手なタイプの方と仕事をする機会はこれまでもありましたが、基本的には「相手がなぜそう考えるのか、その根拠を理解する」ことを心がけています。自分と合わないと感じる相手でも、その人なりの理由や背景があって発言や行動をしていることがほとんどなので、まずそこを聞くようにすると、苦手という印象が和らいでいくことが多いと感じています。',
+          'ゼミの研究でも、自分と異なる意見のメンバーと議論する場面がありましたが、その時も相手の意見の根拠をまず確認し、そこから共通点や折衷案を探っていくことで、結果的により良い結論にたどり着けました。'
+        ],
+        design: [
+          '一次発言「相手の意見と根拠を必ず確認する」を対人関係の文脈で再利用',
+          '「苦手な人はいない」と言うのではなく向き合う姿勢を示す',
+          'SE職(お客様対応が中心)との相性を暗黙的にアピール'
+        ]
+      },
+      {
+        id: 'i4',
+        q: 'コミュニケーションは自分から? 相手から?',
+        priority: 'mid',
+        prob: '21年卒で出題',
+        tags: ['自分から派'],
+        answer: [
+          '基本的には自分から取りにいくタイプだと思っています。学生時代の経験を振り返っても、自分から話しかけたり、自分から動いたりすることで場が動くという経験を何度かしてきたので、相手から来るのを待つより、自分から一歩踏み出す方が性に合っています。',
+          'ただ、相手のペースを無視して押し付けるのは違うと思っているので、自分から声をかけた後は、相手の反応を見ながら距離感を調整するようにしています。'
+        ],
+        design: [
+          '一次発言の弱み「困っていると放っておけず自分でやってしまう」のポジティブ側',
+          '「押し付けない」という配慮で、ガンガン行くだけではない人物像を作る',
+          '価値観深掘りとの一貫性も確保'
+        ]
+      },
+      {
+        id: 'i5',
+        q: '自分からなら最初にどんな会話をする?',
+        priority: 'mid',
+        prob: 'i4の深掘り',
+        tags: ['深掘り'],
+        answer: [
+          '相手のことを知る入口になりそうな話題を選びます。相手の出身地や、今取り組んでいること、興味のあることなど、答えやすくて、会話を広げられる話題から入ります。',
+          'いきなり本題や深い話に入るよりも、軽い話で一度関係を作ってから本題に入った方が、相手も本音で話しやすくなると感じています。'
+        ],
+        design: [
+          'SE/PMとして顧客対応する時の立ち上げスキルそのもの',
+          '「答えやすい話題から」「関係を作ってから本題」の順序立てが仕事の進め方にも通じる'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'learning',
+    label: 'IT知識',
+    intro: 'ITについて勉強したことと、最近のITニュース。物流2026年問題を軸に、勉強と業界関心の両方を語れる構造。ITパスポート取得動機は一次発言と完全整合。',
+    cards: [
+      {
+        id: 'l1',
+        q: 'ITについて勉強したことを教えてください',
+        priority: 'high',
+        prob: '21年卒・26年卒で出題',
+        tags: ['三段構造', '資格+ニュース'],
+        answer: [
+          '主に三つあります。',
+          '一つ目は、昨年ITパスポート試験を取得したことです。きっかけは、経済学部で経営を学んでいる中で、経営とITを体系的に結びつけて理解したいと考えたことで、ゼミの指導教官に勧めていただいたのが後押しになりました。',
+          '二つ目は、現在基本情報技術者試験に挑戦していることです。ITパスポートで全体像を理解できたので、もう一段技術寄りの知識を身につけたいと思い、取り組んでいるところです。就活と並行しているため科目Bのプログラミングで少し詰まってはいますが、内定をいただけた後にしっかり取りきるつもりでいます。',
+          '三つ目は、資格の勉強とは別に、自分が関心のあるIT業界の動きや個別企業の取り組みについて、日々ニュースや記事を読むようにしていることです。例えば最近では、4月に施行された改正物流効率化法とそれに伴う物流DXの動きに関心を持ち、荷主企業側の対応や配車最適化のAI活用など、一つのテーマを掘り下げて調べていました。机上の知識だけでなく、実際に業界でITがどう使われているかを追うことも、自分なりの勉強として続けています。'
+        ],
+        design: [
+          '三段構造(資格取得済み+挑戦中+日々の情報収集)',
+          '一次発言との完全整合(ITパスポート動機、基本情報挑戦中の状況)',
+          '三つ目で物流2026年問題を仕込む(ITニュースの別枠質問が来なくても織り込める)',
+          '「内定後にしっかり取りきる」で志望度も間接アピール'
+        ]
+      },
+      {
+        id: 'l2',
+        q: '資格以外で何かやっていますか?',
+        priority: 'mid',
+        prob: 'l1の深掘り',
+        tags: ['ID企業研究'],
+        answer: [
+          '先ほどお話しした業界ニュースを日常的に追うことに加えて、御社のような個別企業についても、採用情報や公開されている資料を読み込むようにしています。',
+          '例えば御社がAIコンシェルジュや鳥取大学との共同研究など、具体的なサービスや取り組みを外部に発信されていることを知り、多様な事業分野を持つ会社がどのように新しい技術を取り込んでいるか、具体的にイメージできるようになりました。こうした調査も、資格試験とは別の形での自分なりの勉強だと考えています。'
+        ],
+        design: [
+          'IDの具体的取り組み名(AIコンシェルジュ、鳥取大学共同研究)を口に出すことで企業研究の深さを間接アピール',
+          '志望動機本体では出していない情報なので深掘りの二の手'
+        ]
+      },
+      {
+        id: 'l3',
+        q: '最近気になったITニュースは?',
+        priority: 'mid',
+        prob: '高確率',
+        tags: ['物流2026年問題', 'メインネタ'],
+        answer: [
+          '最近特に関心を持ったのは、この4月に本格適用が始まった改正物流効率化法、いわゆる物流の「2026年問題」と、それに伴って加速している物流DXの動きです。',
+          '2024年のドライバー労働時間規制に続いて、今度は荷主企業側に物流効率化の義務が課されるもので、対象となる特定荷主は3000社を超えると言われています。対策を講じなければ2030年には全国の荷物の約3割が運べなくなるという試算もあり、荷主企業にとっては在庫管理のデジタル化や配車の最適化が待ったなしの状況になっています。',
+          'この話に関心を持った理由は、就職活動でもともと物流業界を見ていたこととも繋がっていて、現場の労働問題に見えても、実は根っこにあるのはデータの可視化や業務プロセスの標準化といった、IT側が解かなければならない課題だという点に面白さを感じたからです。一つの業界の構造的な問題をITが解きにいく、という構図が、私が最初にIT業界に興味を持ったきっかけと重なる部分があり、印象に残りました。'
+        ],
+        design: [
+          '一次発言「子供の頃から物流に関心」と直結',
+          '改正物流効率化法・2026年問題・3000社・34%不足 など具体的な数字を含む',
+          '「なぜ関心を持ったか」を志望動機の軸(業界構造をITが変える)と接続',
+          'サブネタとして金融機関のデジタル投資3割増(約3兆円)も持っておく'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'selection',
+    label: '志望度',
+    intro: '志望度・他社状況・会社選びの軸。エージェントには「ユーザー系が第1志望群・IDが第2志望群」と伝達済みだが、面接では「第一志望群」として答える。他社選考中の事実は隠さない(後で整合性が崩れるリスク回避)。',
+    cards: [
+      {
+        id: 's1',
+        q: '弊社の志望度はどれくらいですか',
+        priority: 'high',
+        prob: '高確率',
+        tags: ['レベル1', '強度最弱'],
+        answer: [
+          '御社の志望度は非常に高く持っております。正直に申し上げますと、選考を進めていただく中で、説明会や一次面接を通じて当初の印象以上に魅力を感じるようになった企業です。',
+          '特に、金融、インフラ、航空といった多様な事業分野を手掛けられている点と、キャリアがどうであれ手を挙げれば挑戦できるという社風の両方に強い共感を覚えており、自分が長く働き、成長していけるイメージが最も具体的に持てている企業の一つです。ご縁をいただけるのであれば、ぜひ入社させていただきたいと考えております。'
+        ],
+        design: [
+          '「非常に高く」と明確表明',
+          '「選考を進める中で印象以上に」で真摯さを表現',
+          '「最も」ではなく「最も~の一つ」で嘘ではないラインを維持',
+          '志望動機のキーワードを再登場させて一貫性'
+        ]
+      },
+      {
+        id: 's2',
+        q: '弊社は第1志望ですか',
+        priority: 'high',
+        prob: '高確率',
+        tags: ['レベル2', '直球質問'],
+        answer: [
+          '現時点で第一志望群の中に御社が入っております。他社の選考もまだ進んでおりますが、御社は自分の価値観と最も合致する企業の一つだと感じており、ご縁をいただけた場合は入社させていただきたいと強く考えております。'
+        ],
+        design: [
+          '「第一志望群」という表現でエージェント承認の範囲内',
+          '他社選考中を隠さない(整合性リスク回避)',
+          '「最も~の一つ」で順位付けを避けつつ熱意を維持',
+          '(追加質問「その中で1位?」には「他社の選考状況もまだ動いているので確定的に申し上げるのは難しい」と順位付けから逃げる)'
+        ]
+      },
+      {
+        id: 's3',
+        q: 'もし弊社から内定が出たらどうされますか',
+        priority: 'high',
+        prob: '可能性あり',
+        tags: ['レベル3', '意思確認'],
+        answer: [
+          '御社から内定をいただけるのであれば、ぜひ入社させていただきたいと考えております。他社の選考もまだ動いている最中ですが、御社は自分の中で最も具体的に働くイメージが持てている企業の一つですので、現段階の正直な気持ちとして、強く入社を希望しております。'
+        ],
+        design: [
+          'エージェント指導「志望度高めに見せる方向」に沿う',
+          '「他社選考中」は明記(嘘にならないライン)',
+          '「第1志望」と言い切らずエージェント情報との齟齬を回避'
+        ]
+      },
+      {
+        id: 's4',
+        q: '他社はどこを受けていますか',
+        priority: 'mid',
+        prob: '可能性あり',
+        tags: ['一次と整合'],
+        answer: [
+          'IT業界の中で、ユーザー系、独立系、メーカー系を幅広く見ており、現在十数社ほど選考を進めております。',
+          '(具体名を聞かれたら)ユーザー系の〇〇社、△△社などが選考中の段階です。'
+        ],
+        design: [
+          '一次発言「10社ほど選考中」「独立系・ユーザー系・メーカー系を見ている」と整合',
+          '具体名は聞かれない限り出さない',
+          'オーク情報・フコク情報の名前は聞かれたら出す、聞かれなければ出さない'
+        ]
+      },
+      {
+        id: 's5',
+        q: '会社選びで一番大切にすることは、最終決定はどうしますか',
+        priority: 'mid',
+        prob: '21年卒で出題',
+        tags: ['軸の再提示'],
+        answer: [
+          '(軸)会社選びで大切にしているのは二つあります。一つは、幅広い業界や分野に携わりながら、ITを通じて社会を支える仕事ができる環境であること。もう一つは、自分から動いたり挑戦したりする姿勢が評価され、後押しされる社風であることです。どちらも、私がIT業界を志望した経緯や、自分自身の働き方の志向と深く関わっているので、この二つを軸に選んでいます。',
+          '(最終決定)複数の企業から内定をいただいた場合、それぞれの会社で自分が働いている姿がどれだけ具体的にイメージできるかを基準にしたいと考えています。事業の広がりや社風に加えて、選考を通じてお会いした方々の雰囲気や実際の仕事の進め方の情報など、総合的に見て、自分が長く成長していけるイメージが一番具体的に持てるところを選びたいと思っています。'
+        ],
+        design: [
+          '志望動機と同じ軸(多様性×チャレンジ文化)を使い一貫性を強化',
+          '「御社が一番」と明言せずとも、IDがこの基準に強く当てはまると暗示',
+          '「最もイメージが具体的に持てている」は志望度回答(s1)と同じフレーズ'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'reverse',
+    label: '逆質問',
+    intro: 'エージェント推奨は3本以上(+内容が飛んでも困らないよう10個くらい準備)。経営・数字系はNG(エージェント指摘「新卒段階だと逆効果」)、「学ぶべきこと」「挑戦事例」「伸びる若手」系が推奨。メインは3本、予備を7本。',
+    cards: [
+      {
+        id: 'r1',
+        q: 'メイン3本(推奨セット)',
+        priority: 'high',
+        prob: '必ず使う',
+        tags: ['本番で実際に出す'],
+        answer: [
+          '1. 内定をいただいた後、入社までの期間で特に力を入れて勉強しておくべきことがあれば教えていただきたいのですが、現場責任者のお立場から見て、入社時にこれを知っておいてくれると早く立ち上がれる、というものはありますか。',
+          '2. 「自分から手を挙げれば新しい分野に挑戦できる」という文化に惹かれて志望しているのですが、実際に手を挙げて分野を変えられた方の事例や、そのきっかけとなった動きがあれば伺いたいです。',
+          '3. 現場の責任者としてエンジニアを見ておられる中で、「この人は伸びる」と感じる若手に共通する特徴があれば教えてください。'
+        ],
+        design: [
+          '#1: エージェント推奨、志望度+真摯さ',
+          '#2: 志望動機のチャレンジ文化に直結、一貫性',
+          '#3: 現場責任者が話したい質問+自分がそうなりたい姿勢'
+        ]
+      },
+      {
+        id: 'r2',
+        q: '予備①:入社前〜入社直後系',
+        priority: 'mid',
+        prob: '予備',
+        tags: ['予備'],
+        answer: [
+          '・基本情報技術者試験に現在挑戦しているのですが、御社で活躍されている文系出身の方は、入社前にどのような準備をされていたケースが多いでしょうか。',
+          '・研修でプログラミングやシステム設計を学べると伺っていますが、研修の段階でつまずく方が多いポイントと、そこを乗り越えた方に共通する姿勢や取り組み方があれば教えていただきたいです。'
+        ],
+        design: [
+          '文系・基本情報挑戦中という自分の状況と接続',
+          '研修への関心=入社意欲'
+        ]
+      },
+      {
+        id: 'r3',
+        q: '予備②:キャリア・職種系',
+        priority: 'mid',
+        prob: '予備',
+        tags: ['予備'],
+        answer: [
+          '・入社後1〜2年目の若手の方が、お客様先でどのようにステップアップされているのか、現場責任者のお立場から見て印象に残っている成長の事例があれば伺いたいです。',
+          '・10年ほどエンジニアとして経験を積んだ後にプロジェクトマネジメントに進みたいと考えているのですが、御社でPMとして活躍されている方に共通する、若手のうちから意識されていた姿勢や経験はありますか。',
+          '・アプリケーション開発エンジニアを志望しているのですが、若手のうちに複数のお客様や業界を経験される方と、一つの現場にじっくり携わる方の両方がいらっしゃると認識しています。それぞれのキャリアの積み方に違いはありますか。'
+        ],
+        design: [
+          'キャリアプラン(SE→PM)との一貫性',
+          '職種理解の深さも示せる'
+        ]
+      },
+      {
+        id: 'r4',
+        q: '予備③:事業・現場系',
+        priority: 'mid',
+        prob: '予備',
+        tags: ['予備'],
+        answer: [
+          '・御社は金融、インフラ、航空など多様な事業分野を手掛けられていますが、エンジニアの方が業界をまたいで異動される場合、その業界の業務知識はどのように身につけていくケースが多いでしょうか。',
+          '・DXやAIといった新しい領域に注力されていると認識しているのですが、若手の段階からそうした新領域のプロジェクトに関わっていく機会はありますか。',
+          '・現場で働かれていて、最も面白いと感じる瞬間と、逆に難しさを感じる瞬間をそれぞれ伺ってみたいです。',
+          '・お客様と長くお付き合いされていく中で、御社のエンジニアが他社と比べて強いと感じる点は、ご自身のお立場からご覧になってどんな部分でしょうか。'
+        ],
+        design: [
+          '多様性×新技術という志望動機の軸と直結',
+          '現場責任者への質問として相性良好'
+        ]
+      },
+      {
+        id: 'r5',
+        q: 'NG質問(出してはいけないもの)',
+        priority: 'low',
+        prob: '参考',
+        tags: ['注意', 'NG'],
+        answer: [
+          '・有価証券報告書や財務諸表に基づく経営数字系(エージェント指摘「なぜそこに興味?とネガティブに見られる」)',
+          '・一次で既に聞いた内容と被る質問(モチヅキさんの「お客様と一丸」、自分の「文系未経験の最初の案件」)',
+          '・残業・有給・条件面の質問(志望度を下げて見せる)'
+        ],
+        design: [
+          'エージェント指導を明示化',
+          '出しちゃダメな範囲を明確化しておく'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'edge',
+    label: '周辺質問',
+    intro: '英語・海外経験・アイスブレイク素材。出題確率は低め(アプリケーション開発エンジニア志望で、IDは国内顧客中心・26年卒体験記でも英語の話題なし)だが備えておく。嘘をつかず正直+前向きで。',
+    cards: [
+      {
+        id: 'e1',
+        q: '英語は得意ですか',
+        priority: 'low',
+        prob: '低確率',
+        tags: ['正直に', '備え'],
+        answer: [
+          '正直に申し上げますと、現時点では得意ではありません。これまでの学生生活では、経済史や経営学の研究が中心だったこともあり、英語を日常的に使う機会があまりなく、読む・書く・話すのいずれも、ビジネスレベルには遠い状況です。',
+          'ただ、御社が海外にも多くの拠点を展開されていることや、今後ITの仕事をしていく上で英語のドキュメントを読む機会は必ず出てくると思っていますので、入社までの期間と入社後の時間をかけて、少しずつでも力をつけていきたいと考えています。特に、まずは技術ドキュメントを読めるレベルのリーディングから始めて、段階的に広げていきたいと思っています。',
+          '(短縮版)正直、得意ではないです。学生時代は経済史の研究と国内のアルバイトが中心だったこともあって、英語に注力できていませんでした。御社のような海外展開もされている企業で働く以上、入社までと入社後の時間を使って、少しずつ伸ばしていきたいと考えています。'
+        ],
+        design: [
+          '「現状の正直な自認→背景の事実→次の一歩の具体化」の型',
+          '「できない」「無理」は言わない、「得意ではない」に留める',
+          '言い訳ではなく事実として背景を述べる(経済史専攻、国内アルバイト)',
+          'リーディングから始めるという等身大の最初の一歩'
+        ]
+      },
+      {
+        id: 'e2',
+        q: 'TOEICなど具体的なスコアは?',
+        priority: 'low',
+        prob: '低確率(e1の深掘り)',
+        tags: ['備え'],
+        answer: [
+          '直近でTOEICを受けたのは大学1、2年の頃でして、その時のスコアは正直お話しできるほど高くはありませんでした。就活を本格化させる中で、英語は後回しになってしまっていたというのが事実です。ただ、入社後に必要になる可能性があることは認識しておりますので、内定をいただけた後の時間を使って、まずはスコアを把握し直すところからやっていこうと考えています。'
+        ],
+        design: [
+          '数字を聞かれても嘘つかない',
+          '「スコアを把握し直す」=再受験の意志を柔らかく表現',
+          '「内定をいただけた後」で志望度も間接アピール'
+        ]
+      },
+      {
+        id: 'e3',
+        q: '海外で働きたいですか',
+        priority: 'low',
+        prob: '低確率',
+        tags: ['備え'],
+        answer: [
+          '現時点で、海外勤務を積極的に希望しているかと言われると、そこまで強い希望を持っているわけではないというのが正直なところです。',
+          'ただ、御社が海外にも拠点を展開されていて、グローバルに事業を進められている環境で働くことそのものには関心があります。将来的にご縁があって海外の案件や拠点に関わる機会が出てきた場合には、英語のハードルも含めて、その時までに準備ができる状態を作っておきたいという姿勢は持っています。'
+        ],
+        design: [
+          '嘘をつかず中庸',
+          '一次で勤務地「東京・茨城」と答えたこととの整合性',
+          '「関心はある」「機会が来れば準備する」の中間的姿勢'
+        ]
+      },
+      {
+        id: 'e4',
+        q: '海外経験はありますか(留学・旅行など)',
+        priority: 'low',
+        prob: '低確率',
+        tags: ['備え'],
+        answer: [
+          '現時点で、留学や長期滞在など、海外での生活経験はまだ持っていません。学生時代は、経済史や経営史の研究と、国内でのアルバイトに力を注いできたため、海外に出る機会を作れていなかったというのが正直なところです。ただ、御社のような海外拠点をお持ちの企業で働く中で、自分から機会を作っていければと考えています。'
+        ],
+        design: [
+          '「まだ持っていません」で前向きな表現',
+          '「国内でのアルバイトに注力」と一次の強みエピソードと接続',
+          '「海外に行かなかった=怠けていた」ではなく「別の選択をしていた」というニュアンス'
+        ]
+      },
+      {
+        id: 'e5',
+        q: 'アイスブレイク:一次面接の印象や趣味について',
+        priority: 'mid',
+        prob: '26年卒の最終で実際にあった',
+        tags: ['雑談対応'],
+        answer: [
+          '(一次の印象)一次面接では、ゴトウさんもカンさんも丁寧に質問を整理してくださり、とても話しやすい雰囲気だったと感じています。緊張していた部分もあったのですが、自分の思いを丁寧に聞いていただけたことで、御社への志望度がさらに上がりました。',
+          '(趣味について)趣味は多岐にわたっていまして、一つは野球観戦で、特に阪神タイガースを昔から応援しています。試合結果や選手の動向を追うのが日常的な楽しみになっています。もう一つは音楽鑑賞で、80年代の日本のフュージョン音楽、THE SQUAREやカシオペアといったバンドが好きで、最近はDTMで自分でも音を作ってみたりしています。',
+          '(水曜どうでしょう・映画などの引き出しも)他には、北海道の「水曜どうでしょう」というテレビ番組を長年見続けていて、大人になってから旅や街歩きにも興味を持つようになりました。'
+        ],
+        design: [
+          '軽い話題でも答えが用意されていれば場に馴染みやすい',
+          '趣味の引き出しは複数用意(野球・音楽・TV)',
+          '「緊張していた部分もある」と正直さを出す=人間味',
+          '「志望度がさらに上がった」と自然に好意を示す'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'dayof',
+    label: '当日',
+    intro: '当日までにやること・当日の振る舞い・マナー・残タスク。面接直前に流し見する用。',
+    cards: [
+      {
+        id: 'd1',
+        q: '当日までの残タスク',
+        priority: 'high',
+        prob: '本人作業',
+        tags: ['チェックリスト'],
+        answer: [
+          '□ エージェントに志望度の開示状況を確認(「第一志望群」と答えるが、貴社から企業側に伝えていただいている内容と齟齬ないか)',
+          '□ エージェントから送付されるマナー動画の視聴(移動の電車内でもOK)',
+          '□ 改正物流効率化法のニュース、直前にもう一度確認(状況変化がないか)',
+          '□ IDの採用サイト・会社概要をもう一度目に入れる(顧客業界の表現、AIコンシェルジュなどの取り組み名)',
+          '□ 新版志望動機を一度音読(2〜3分に収まるか確認)',
+          '□ 逆質問メイン3本と予備3本を頭に入れる'
+        ],
+        design: null
+      },
+      {
+        id: 'd2',
+        q: '当日の振る舞い:マナー編',
+        priority: 'high',
+        prob: '当日',
+        tags: ['マナー'],
+        answer: [
+          '□ ノック3回(2回はトイレ用なのでNG)',
+          '□ 担当者に「座ってください」と言われるまで立っておく',
+          '□ 姿勢:座面の前半分〜3分の2、背もたれに寄りかからない',
+          '□ 手は軽く拳を握って膝の上、または両手を膝の上で重ねる',
+          '□ 足は揃えて床にしっかり、組まない',
+          '□ 目線は面接官の顔のあたり(眉間〜鼻でOK)',
+          '□ 入退室と場が和む瞬間は笑顔で',
+          '□ 話している最中は真剣な表情でOK、無理に笑顔を作らない',
+          '□ その他の細かい挨拶は流れで省略されても気にしない'
+        ],
+        design: null
+      },
+      {
+        id: 'd3',
+        q: '当日の振る舞い:話し方・応答編',
+        priority: 'high',
+        prob: '当日',
+        tags: ['立ち居振る舞い'],
+        answer: [
+          '□ 雰囲気は緩い可能性が高い(26年卒でアイスブレイクあり)が、雑談風の質問ほど本音を探っている',
+          '□ 答えの軸は一次と絶対にブラさない(最終は一次メモを見ながら進行)',
+          '□ 緩い雰囲気につられて話を盛らない・勢いで違うことを言わない',
+          '□ 応答テンポ:自然体、意識しすぎてワンテンポ遅くなるのは避ける',
+          '□ 対面はZoomより少し丁寧に、ただし意識しすぎない',
+          '□ 身振り手振り:意識的に入れない、自然に出る分はそのまま',
+          '□ 数を示す時は指を立てる(論理性が視覚化される)',
+          '□ 面接官の話を聞く時は軽く頷く(1文に1回程度)',
+          '□ 緊張したら「手を膝の上に置く」というシンプルなルールに戻る'
+        ],
+        design: null
+      },
+      {
+        id: 'd4',
+        q: '会社見学があった場合',
+        priority: 'mid',
+        prob: '可能性あり',
+        tags: ['26年卒で実施'],
+        answer: [
+          '・エージェント情報通り、会社見学がある可能性あり(26年卒で実施確認)',
+          '・案内される方には丁寧にお礼を伝える',
+          '・気になったことは素直に質問する(逆質問の延長)',
+          '・オフィスや社員の様子を見て「ここで働きたい」感を自然に出す',
+          '・連絡先を交換するような場面があっても慌てない'
+        ],
+        design: null
+      },
+      {
+        id: 'd5',
+        q: '面接官情報(事前把握済み)',
+        priority: 'mid',
+        prob: '参考',
+        tags: ['エージェント情報'],
+        answer: [
+          '・面接官は2名(人事+現場責任者)の可能性が高い',
+          '・雰囲気は全体的に和やか、話しやすい雰囲気を作ってくれる',
+          '・過去の質問内容は「一次面接で聞かれた内容の振り返り」がメイン',
+          '・突発的な急な質問は来ない',
+          '・経験談については率直に自分の思いを伝えてほしいとのこと',
+          '・IDホールディングス全体として考えてほしい(職種単独で閉じない)',
+          '・ITに関する興味関心は事前に用意しておくとよい'
+        ],
+        design: null
+      }
+    ]
+  }
+];
+
+// ============ COMPONENTS ============
+function App() {
+  const [activeTab, setActiveTab] = useState('core');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [openCards, setOpenCards] = useState({});
+  const [completed, setCompleted] = useState({});
+
+  const toggleCard = (id) => {
+    setOpenCards(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const toggleComplete = (id, e) => {
+    e.stopPropagation();
+    setCompleted(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const filteredSections = useMemo(() => {
+    if (!searchQuery) return SECTIONS;
+    const q = searchQuery.toLowerCase();
+    return SECTIONS.map(sec => ({
+      ...sec,
+      cards: sec.cards.filter(c =>
+        c.q.toLowerCase().includes(q) ||
+        (c.answer || []).some(a => a.toLowerCase().includes(q)) ||
+        (c.tags || []).some(t => t.toLowerCase().includes(q))
+      )
+    })).filter(sec => sec.cards.length > 0);
+  }, [searchQuery]);
+
+  const currentSection = searchQuery
+    ? filteredSections
+    : SECTIONS.filter(s => s.id === activeTab);
+
+  const totalCards = SECTIONS.reduce((sum, s) => sum + s.cards.length, 0);
+  const completedCount = Object.values(completed).filter(Boolean).length;
+  const progressPct = totalCards > 0 ? (completedCount / totalCards) * 100 : 0;
+
+  return (
+    <>
+      <div className="container">
+        <div className="header">
+          <div className="kicker">Interview Preparation · Final Stage</div>
+          <h1 className="title">IDホールディングス 最終面接</h1>
+          <div className="title-sub">対策統合版 ·  埼玉大学経済学部 根本</div>
+          <div className="meta">
+            <span><strong>{SECTIONS.length}</strong> セクション</span>
+            <span><strong>{totalCards}</strong> 質問・回答</span>
+            <span>エージェント対策・体験記<strong>2021/2026</strong>・IR情報 統合</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="progress">
+        <div className="container">
+          <div className="progress-inner">
+            <div className="progress-label">
+              進捗 <strong>{completedCount} / {totalCards}</strong>
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: `${progressPct}%` }}></div>
+            </div>
+            <div className="progress-label">
+              <strong>{Math.round(progressPct)}%</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container">
+        <div className="controls">
+          <div className="search-bar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              placeholder="質問を検索..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button className="search-clear" onClick={() => setSearchQuery('')}>
+                CLEAR
+              </button>
+            )}
+          </div>
+        </div>
+
+        {!searchQuery && (
+          <div className="tabs">
+            {SECTIONS.map(sec => (
+              <button
+                key={sec.id}
+                className={`tab ${activeTab === sec.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(sec.id)}
+              >
+                {sec.label}
+                <span className="tab-count">{sec.cards.length}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {currentSection.length === 0 && searchQuery && (
+          <div className="empty">
+            <div className="kicker">No results</div>
+            <div>「{searchQuery}」に一致する質問が見つかりませんでした。</div>
+          </div>
+        )}
+
+        {currentSection.map(sec => (
+          <div key={sec.id}>
+            {!searchQuery && <div className="section-intro">{sec.intro}</div>}
+            {searchQuery && (
+              <div className="section-intro" style={{ borderLeftColor: 'var(--accent)' }}>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.15em', color: 'var(--accent)' }}>
+                  {sec.label}セクション
+                </span>
+                <span style={{ marginLeft: 12, color: 'var(--text-dim)' }}>
+                  {sec.cards.length}件ヒット
+                </span>
+              </div>
+            )}
+
+            {sec.cards.map((card, idx) => (
+              <div
+                key={card.id}
+                className={`card ${openCards[card.id] ? 'open' : ''} ${completed[card.id] ? 'completed' : ''}`}
+              >
+                <div className="card-head" onClick={() => toggleCard(card.id)}>
+                  <div className="card-index">
+                    {String(idx + 1).padStart(2, '0')}
+                  </div>
+                  <div className="card-q">
+                    <span className="q-label">Q</span>
+                    {card.q}
+                    <div className="tag-row">
+                      {card.priority && (
+                        <span className={`tag priority-${card.priority}`}>
+                          {card.priority === 'high' ? '★ 最重要' : card.priority === 'mid' ? '要準備' : '備え'}
+                        </span>
+                      )}
+                      {card.prob && <span className="tag">{card.prob}</span>}
+                      {(card.tags || []).map((t, i) => <span key={i} className="tag">{t}</span>)}
+                    </div>
+                  </div>
+                  <button
+                    className={`check-btn ${completed[card.id] ? 'checked' : ''}`}
+                    onClick={(e) => toggleComplete(card.id, e)}
+                    title="練習済み"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </button>
+                  <svg className="toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+
+                <div className="card-body">
+                  <div className="body-label">回答</div>
+                  <div className="answer">
+                    {card.answer.map((p, i) => <p key={i}>{p}</p>)}
+                  </div>
+
+                  {card.design && (
+                    <>
+                      <div className="body-label">設計意図・注意点</div>
+                      <div className="design-note">
+                        <ul>
+                          {card.design.map((d, i) => <li key={i}>{d}</li>)}
+                        </ul>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+
+        <div className="footer">
+          <span>ID Holdings · Final Interview · v1.0</span>
+          <span>Prepared for 根本あおば · 埼玉大学経済学部</span>
+        </div>
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
