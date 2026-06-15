@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Invert Bouncing Circles</title>
+  <style>
+    :root {
+      --yellow: #ffe600;
+      --black: #050505;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--yellow);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      touch-action: manipulation;
+    }
+    #app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: var(--yellow);
+      overflow: hidden;
+      cursor: crosshair;
+    }
+    .layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .text {
+      color: var(--black);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 8vh 7vw 6vh;
+      gap: 1.2vh;
+      user-select: none;
+      -webkit-user-select: none;
+      pointer-events: none;
+      line-height: 1;
+      font-weight: 900;
+    }
+    .hero {
+      font-size: clamp(34px, 8vw, 92px);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.2em;
+    }
+    .sub {
+      font-size: clamp(16px, 2.4vw, 30px);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      margin-bottom: 1.2em;
+    }
+    .line {
+      font-size: clamp(14px, 2vw, 24px);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    #overlayText {
+      color: var(--yellow);
+      clip-path: url(#circlesClip);
+      -webkit-clip-path: url(#circlesClip);
+    }
+    #svgLayer {
+      pointer-events: none;
+    }
+    .ball {
+      fill: var(--black);
+    }
+    .hint {
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      color: var(--black);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      user-select: none;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" aria-label="黄色背景に黒文字、跳ねる円と重なった部分だけ反転するデモ">
+    <div class="layer text" id="baseText"></div>
+
+    <svg class="layer" id="svgLayer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <clipPath id="circlesClip" clipPathUnits="userSpaceOnUse">
+          <g id="clipCircles"></g>
+        </clipPath>
+      </defs>
+      <g id="renderCircles"></g>
+    </svg>
+
+    <div class="layer text" id="overlayText"></div>
+    <div class="hint">TAP / CLICK TO ADD CIRCLES</div>
+  </div>
+
+  <script>
+    (() => {
+      const app = document.getElementById('app');
+      const baseText = document.getElementById('baseText');
+      const overlayText = document.getElementById('overlayText');
+      const svgLayer = document.getElementById('svgLayer');
+      const renderCircles = document.getElementById('renderCircles');
+      const clipCircles = document.getElementById('clipCircles');
+
+      let width = 0;
+      let height = 0;
+      const balls = [];
+
+      const rows = [
+        'YELLOW BACKGROUND / BLACK LETTERS',
+        'BOUNCING CIRCLES / INVERT ONLY INSIDE',
+        '黄色背景 / 黒文字 / 円の中だけ反転',
+        'CLICK OR TAP TO ADD MORE CIRCLES',
+        'BLACK / YELLOW / MOTION / OVERLAP',
+        'ROUND / BOUNCE / REVERSE / TYPE'
+      ];
+
+      function random(min, max) {
+        return min + Math.random() * (max - min);
+      }
+
+      function buildText(target) {
+        target.innerHTML = '';
+
+        const hero = document.createElement('div');
+        hero.className = 'hero';
+        hero.textContent = 'BLACK / YELLOW';
+        target.appendChild(hero);
+
+        const sub = document.createElement('div');
+        sub.className = 'sub';
+        sub.textContent = 'INVERTING BOUNCING CIRCLES';
+        target.appendChild(sub);
+
+        const count = Math.max(10, Math.floor(height / 48));
+        for (let i = 0; i < count; i++) {
+          const line = document.createElement('div');
+          line.className = 'line';
+          line.textContent = rows[i % rows.length];
+          target.appendChild(line);
+        }
+      }
+
+      function addBall(x = random(width * 0.15, width * 0.85), y = random(height * 0.18, height * 0.82)) {
+        const r = Math.max(34, Math.min(width, height) * random(0.06, 0.11));
+        const speed = random(1.8, 3.6);
+        const angle = random(0, Math.PI * 2);
+        balls.push({
+          x, y, r,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed
+        });
+      }
+
+      function syncSvgSize() {
+        svgLayer.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      }
+
+      function resize() {
+        width = Math.max(1, app.clientWidth);
+        height = Math.max(1, app.clientHeight);
+        syncSvgSize();
+        buildText(baseText);
+        buildText(overlayText);
+
+        if (balls.length === 0) {
+          addBall(width * 0.2, height * 0.28);
+          addBall(width * 0.68, height * 0.48);
+          addBall(width * 0.42, height * 0.74);
+        }
+
+        for (const b of balls) {
+          b.r = Math.min(b.r, Math.min(width, height) * 0.2);
+          b.x = Math.min(Math.max(b.x, b.r), width - b.r);
+          b.y = Math.min(Math.max(b.y, b.r), height - b.r);
+        }
+      }
+
+      function update() {
+        for (const b of balls) {
+          b.x += b.vx;
+          b.y += b.vy;
+
+          if (b.x - b.r <= 0) {
+            b.x = b.r;
+            b.vx = Math.abs(b.vx);
+          }
+          if (b.x + b.r >= width) {
+            b.x = width - b.r;
+            b.vx = -Math.abs(b.vx);
+          }
+          if (b.y - b.r <= 0) {
+            b.y = b.r;
+            b.vy = Math.abs(b.vy);
+          }
+          if (b.y + b.r >= height) {
+            b.y = height - b.r;
+            b.vy = -Math.abs(b.vy);
+          }
+        }
+      }
+
+      function render() {
+        renderCircles.innerHTML = '';
+        clipCircles.innerHTML = '';
+
+        for (const b of balls) {
+          const c1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          c1.setAttribute('cx', b.x);
+          c1.setAttribute('cy', b.y);
+          c1.setAttribute('r', b.r);
+          c1.setAttribute('class', 'ball');
+          renderCircles.appendChild(c1);
+
+          const c2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          c2.setAttribute('cx', b.x);
+          c2.setAttribute('cy', b.y);
+          c2.setAttribute('r', b.r);
+          clipCircles.appendChild(c2);
+        }
+      }
+
+      function loop() {
+        update();
+        render();
+        requestAnimationFrame(loop);
+      }
+
+      function placeBallFromEvent(event) {
+        const rect = app.getBoundingClientRect();
+        const point = event.touches ? event.touches[0] : event;
+        addBall(point.clientX - rect.left, point.clientY - rect.top);
+      }
+
+      app.addEventListener('click', (event) => {
+        placeBallFromEvent(event);
+      });
+
+      app.addEventListener('touchstart', (event) => {
+        event.preventDefault();
+        placeBallFromEvent(event);
+      }, { passive: false });
+
+      window.addEventListener('resize', resize);
+      resize();
+      render();
+      loop();
+    })();
+  </script>
+</body>
+</html>
