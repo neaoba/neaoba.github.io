@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Invert Bouncing Circles</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Black Yellow Bouncing Invert</title>
   <style>
     :root {
-      --yellow: #fff200;
+      --yellow: #ffe600;
       --black: #050505;
     }
 
@@ -16,245 +16,300 @@
 
     html,
     body {
+      margin: 0;
       width: 100%;
       min-height: 100%;
-      margin: 0;
+      background: var(--yellow);
+      overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
     }
 
     body {
-      overflow: hidden;
-      background: var(--yellow);
       color: var(--black);
-      font-family:
-        "Arial Black",
-        "Helvetica Neue",
-        system-ui,
-        sans-serif;
     }
 
     .stage {
       position: relative;
       width: 100vw;
       height: 100vh;
-      padding: clamp(20px, 5vw, 72px);
+      height: 100svh;
+      min-height: 560px;
+      background: var(--yellow);
+      overflow: hidden;
       isolation: isolate;
     }
 
-    .content {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      height: 100%;
-      align-content: space-between;
-      text-transform: uppercase;
-      letter-spacing: -0.06em;
-    }
-
-    h1 {
-      max-width: 11ch;
-      margin: 0;
-      font-size: clamp(64px, 15vw, 190px);
-      line-height: 0.82;
-    }
-
-    .lead {
-      max-width: 900px;
-      margin: 0;
-      font-size: clamp(20px, 3.5vw, 54px);
-      line-height: 0.95;
-      letter-spacing: -0.045em;
-    }
-
-    .nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 22px;
-      margin-top: 26px;
-      font-size: clamp(15px, 1.6vw, 24px);
-      letter-spacing: -0.025em;
-    }
-
-    .nav a {
-      color: inherit;
-      text-decoration: none;
-      border-bottom: 0.13em solid currentColor;
-    }
-
-    .marquee {
-      position: fixed;
+    .text {
+      position: absolute;
       left: 0;
-      right: 0;
-      bottom: 18px;
-      z-index: 1;
-      overflow: hidden;
-      white-space: nowrap;
-      font-size: clamp(16px, 2vw, 30px);
-      letter-spacing: 0.02em;
-      border-top: 0.16em solid currentColor;
-      border-bottom: 0.16em solid currentColor;
-      padding: 0.24em 0;
-    }
-
-    .marquee span {
-      display: inline-block;
-      min-width: 200%;
-      animation: scrollText 18s linear infinite;
-    }
-
-    @keyframes scrollText {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
-
-    .ball-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 5;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100svh;
+      min-height: 560px;
+      padding: 7vh 7vw;
+      line-height: 0.98;
+      user-select: none;
+      -webkit-user-select: none;
       pointer-events: none;
-      mix-blend-mode: difference;
+      white-space: nowrap;
+    }
+
+    .base {
+      z-index: 1;
+      color: var(--black);
+    }
+
+    .headline {
+      font-size: clamp(44px, 10vw, 132px);
+      font-weight: 950;
+      letter-spacing: -0.045em;
+      margin-bottom: 0.08em;
+    }
+
+    .subhead {
+      font-size: clamp(18px, 3.2vw, 44px);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.7em;
+    }
+
+    .row {
+      font-size: clamp(17px, 2.5vw, 34px);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      margin: 0.34em 0;
     }
 
     .ball {
       position: absolute;
-      left: 0;
-      top: 0;
+      z-index: 2;
       width: var(--size);
       height: var(--size);
-      border-radius: 50%;
-      background: var(--yellow);
-      will-change: transform;
-    }
-
-    .scanline {
-      position: fixed;
-      inset: 0;
-      z-index: 10;
-      pointer-events: none;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgb(0 0 0 / 0.05) 0,
-        rgb(0 0 0 / 0.05) 1px,
-        transparent 1px,
-        transparent 4px
-      );
-      opacity: 0.35;
-      mix-blend-mode: multiply;
-    }
-
-    .hint {
-      position: fixed;
-      right: 18px;
-      top: 16px;
-      z-index: 11;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 12px;
-      letter-spacing: 0;
+      border-radius: 999px;
       background: var(--black);
-      color: var(--yellow);
-      padding: 7px 9px;
+      overflow: hidden;
+      left: 0;
+      top: 0;
+      will-change: left, top;
+      border: 0;
+      outline: 0;
+      transform: translateZ(0);
+      backface-visibility: hidden;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .marquee span {
-        animation: none;
-      }
+    .ball .text {
+      color: var(--yellow);
+      padding: 7vh 7vw;
+      will-change: left, top;
+      border: 0;
+      outline: 0;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .b1 {
+      --size: clamp(92px, 17vw, 190px);
+      animation: ball1 7.5s linear infinite alternate;
+    }
+    .b1 .text {
+      animation: copy1 7.5s linear infinite alternate;
+    }
+
+    .b2 {
+      --size: clamp(76px, 13vw, 156px);
+      animation: ball2 6.2s linear infinite alternate;
+    }
+    .b2 .text {
+      animation: copy2 6.2s linear infinite alternate;
+    }
+
+    .b3 {
+      --size: clamp(108px, 20vw, 220px);
+      animation: ball3 9s linear infinite alternate;
+    }
+    .b3 .text {
+      animation: copy3 9s linear infinite alternate;
+    }
+
+    .b4 {
+      --size: clamp(58px, 10vw, 120px);
+      animation: ball4 5.6s linear infinite alternate;
+    }
+    .b4 .text {
+      animation: copy4 5.6s linear infinite alternate;
+    }
+
+    @keyframes ball1 {
+      0%   { left: 8vw;  top: 18vh; }
+      25%  { left: 70vw; top: 10vh; }
+      50%  { left: 52vw; top: 68vh; }
+      75%  { left: 15vw; top: 58vh; }
+      100% { left: 78vw; top: 36vh; }
+    }
+    @keyframes copy1 {
+      0%   { left: -8vw;  top: -18vh; }
+      25%  { left: -70vw; top: -10vh; }
+      50%  { left: -52vw; top: -68vh; }
+      75%  { left: -15vw; top: -58vh; }
+      100% { left: -78vw; top: -36vh; }
+    }
+
+    @keyframes ball2 {
+      0%   { left: 76vw; top: 68vh; }
+      25%  { left: 22vw; top: 74vh; }
+      50%  { left: 10vw; top: 24vh; }
+      75%  { left: 62vw; top: 16vh; }
+      100% { left: 36vw; top: 54vh; }
+    }
+    @keyframes copy2 {
+      0%   { left: -76vw; top: -68vh; }
+      25%  { left: -22vw; top: -74vh; }
+      50%  { left: -10vw; top: -24vh; }
+      75%  { left: -62vw; top: -16vh; }
+      100% { left: -36vw; top: -54vh; }
+    }
+
+    @keyframes ball3 {
+      0%   { left: 42vw; top: 40vh; }
+      20%  { left: 4vw;  top: 66vh; }
+      45%  { left: 60vw; top: 70vh; }
+      70%  { left: 72vw; top: 18vh; }
+      100% { left: 18vw; top: 10vh; }
+    }
+    @keyframes copy3 {
+      0%   { left: -42vw; top: -40vh; }
+      20%  { left: -4vw;  top: -66vh; }
+      45%  { left: -60vw; top: -70vh; }
+      70%  { left: -72vw; top: -18vh; }
+      100% { left: -18vw; top: -10vh; }
+    }
+
+    @keyframes ball4 {
+      0%   { left: 30vw; top: 76vh; }
+      30%  { left: 84vw; top: 54vh; }
+      62%  { left: 48vw; top: 12vh; }
+      100% { left: 6vw;  top: 34vh; }
+    }
+    @keyframes copy4 {
+      0%   { left: -30vw; top: -76vh; }
+      30%  { left: -84vw; top: -54vh; }
+      62%  { left: -48vw; top: -12vh; }
+      100% { left: -6vw;  top: -34vh; }
+    }
+
+    .note {
+      position: absolute;
+      z-index: 3;
+      right: 12px;
+      bottom: 10px;
+      color: var(--black);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      opacity: 0.65;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
   <main class="stage">
-    <section class="content" aria-label="sample content">
-      <div>
-        <h1>YELLOW MODE</h1>
-        <p class="lead">
-          Black letters on a yellow screen. The bouncing circles flip the visible world only where they touch it.
-        </p>
-        <nav class="nav" aria-label="sample navigation">
-          <a href="#">About</a>
-          <a href="#">Links</a>
-          <a href="#">Archive</a>
-          <a href="#">Guestbook</a>
-        </nav>
-      </div>
-      <p class="lead">◯ ◯ ◯ collide / reflect / invert / repeat</p>
+    <section class="text base">
+      
+<div class="headline">BLACK / YELLOW</div>
+<div class="subhead">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">CLICK PREVIEW NOT REQUIRED</div>
+<div class="row">NO JAVASCRIPT / CSS ONLY</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+
     </section>
+
+    <div class="ball b1">
+      <section class="text">
+<div class="headline">BLACK / YELLOW</div>
+<div class="subhead">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">CLICK PREVIEW NOT REQUIRED</div>
+<div class="row">NO JAVASCRIPT / CSS ONLY</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+</section>
+    </div>
+
+    <div class="ball b2">
+      <section class="text">
+<div class="headline">BLACK / YELLOW</div>
+<div class="subhead">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">CLICK PREVIEW NOT REQUIRED</div>
+<div class="row">NO JAVASCRIPT / CSS ONLY</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+</section>
+    </div>
+
+    <div class="ball b3">
+      <section class="text">
+<div class="headline">BLACK / YELLOW</div>
+<div class="subhead">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">CLICK PREVIEW NOT REQUIRED</div>
+<div class="row">NO JAVASCRIPT / CSS ONLY</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+</section>
+    </div>
+
+    <div class="ball b4">
+      <section class="text">
+<div class="headline">BLACK / YELLOW</div>
+<div class="subhead">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">CLICK PREVIEW NOT REQUIRED</div>
+<div class="row">NO JAVASCRIPT / CSS ONLY</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+<div class="row">YELLOW BACKGROUND / BLACK LETTERS</div>
+<div class="row">BOUNCING CIRCLES INVERT THE TEXT</div>
+<div class="row">ROUND / BOUNCE / REVERSE / TYPE</div>
+<div class="row">BLACK / YELLOW / MOTION / OVERLAP</div>
+<div class="row">黄色背景　黒文字　円の中だけ反転</div>
+</section>
+    </div>
+
+    <div class="note">CSS ONLY / NO SCRIPT</div>
   </main>
-
-  <div class="ball-layer" aria-hidden="true" id="ballLayer"></div>
-  <div class="marquee" aria-hidden="true">
-    <span>
-      YELLOW BACKGROUND / BLACK TYPE / INVERTING CIRCLES / RETRO WEB EXPERIMENT / 
-      YELLOW BACKGROUND / BLACK TYPE / INVERTING CIRCLES / RETRO WEB EXPERIMENT / 
-    </span>
-  </div>
-  <div class="scanline" aria-hidden="true"></div>
-  <div class="hint">click: add circle</div>
-
-  <script>
-    const layer = document.querySelector('#ballLayer');
-    const balls = [];
-
-    function randomBetween(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-
-    function makeBall(options = {}) {
-      const size = options.size ?? randomBetween(90, 220);
-      const el = document.createElement('div');
-      el.className = 'ball';
-      el.style.setProperty('--size', `${size}px`);
-      layer.appendChild(el);
-
-      balls.push({
-        el,
-        size,
-        x: options.x ?? randomBetween(0, Math.max(1, window.innerWidth - size)),
-        y: options.y ?? randomBetween(0, Math.max(1, window.innerHeight - size)),
-        vx: options.vx ?? randomBetween(-4.2, 4.2) || 2.4,
-        vy: options.vy ?? randomBetween(-4.2, 4.2) || -2.4,
-      });
-    }
-
-    for (let i = 0; i < 5; i++) {
-      makeBall();
-    }
-
-    function animate() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-
-      for (const ball of balls) {
-        ball.x += ball.vx;
-        ball.y += ball.vy;
-
-        if (ball.x <= 0 || ball.x + ball.size >= w) {
-          ball.vx *= -1;
-          ball.x = Math.max(0, Math.min(ball.x, w - ball.size));
-        }
-
-        if (ball.y <= 0 || ball.y + ball.size >= h) {
-          ball.vy *= -1;
-          ball.y = Math.max(0, Math.min(ball.y, h - ball.size));
-        }
-
-        ball.el.style.transform = `translate3d(${ball.x}px, ${ball.y}px, 0)`;
-      }
-
-      requestAnimationFrame(animate);
-    }
-
-    animate();
-
-    window.addEventListener('click', (event) => {
-      const size = randomBetween(70, 180);
-      makeBall({
-        size,
-        x: event.clientX - size / 2,
-        y: event.clientY - size / 2,
-        vx: randomBetween(-5.5, 5.5) || 3,
-        vy: randomBetween(-5.5, 5.5) || -3,
-      });
-    });
-  </script>
 </body>
 </html>
