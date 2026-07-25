@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from "./vendor/three.module.js";
 
 const canvas = document.querySelector("#canvas");
 const fileInput = document.querySelector("#fileInput");
@@ -7,6 +7,15 @@ const image = document.querySelector("#image");
 const status = document.querySelector("#status");
 const scaleMode = document.querySelector("#scaleMode");
 const bgrBox = document.querySelector("#bgr");
+
+window.addEventListener("error", (event) => {
+  status.textContent = "エラー";
+  console.error(event.error || event.message);
+});
+window.addEventListener("unhandledrejection", (event) => {
+  status.textContent = "読み込みエラー";
+  console.error(event.reason);
+});
 
 const defaults = {
   gain: 1.5,
@@ -28,6 +37,33 @@ const definitions = [
   ["bStrength", "B subpixel", 0.0, 1.0, 0.01]
 ];
 
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: false,
+  alpha: true,
+  preserveDrawingBuffer: true
+});
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setPixelRatio(1);
+
+
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+const uniforms = {
+  Source: { value: null },
+  SourceSize: { value: new THREE.Vector4(320, 240, 1 / 320, 1 / 240) },
+  OutputSize: { value: new THREE.Vector4(960, 720, 1 / 960, 1 / 720) },
+  gain: { value: defaults.gain },
+  gamma: { value: defaults.gamma },
+  blacklevel: { value: defaults.blacklevel },
+  ambient: { value: defaults.ambient },
+  BGR: { value: 0 },
+  rStrength: { value: defaults.rStrength },
+  gStrength: { value: defaults.gStrength },
+  bStrength: { value: defaults.bStrength }
+};
+
 const sliders = {};
 const sliderHost = document.querySelector("#sliders");
 for (const [key, label, min, max, step] of definitions) {
@@ -48,38 +84,7 @@ for (const [key, label, min, max, step] of definitions) {
   sliders[key] = input;
 }
 
-const renderer = new THREE.WebGLRenderer({
-  canvas,
-  antialias: false,
-  alpha: true,
-  preserveDrawingBuffer: true
-});
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.setPixelRatio(1);
-
-if (!renderer.capabilities.isWebGL2) {
-  throw new Error("この移植版にはWebGL 2が必要です。");
-}
-
-const scene = new THREE.Scene();
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-const uniforms = {
-  Source: { value: null },
-  SourceSize: { value: new THREE.Vector4(320, 240, 1 / 320, 1 / 240) },
-  OutputSize: { value: new THREE.Vector4(960, 720, 1 / 960, 1 / 720) },
-  gain: { value: defaults.gain },
-  gamma: { value: defaults.gamma },
-  blacklevel: { value: defaults.blacklevel },
-  ambient: { value: defaults.ambient },
-  BGR: { value: 0 },
-  rStrength: { value: defaults.rStrength },
-  gStrength: { value: defaults.gStrength },
-  bStrength: { value: defaults.bStrength }
-};
-
-const vertexShader = `#version 300 es
-in vec3 position;
+const vertexShader = `in vec3 position;
 in vec2 uv;
 out vec2 vTexCoord;
 
@@ -89,8 +94,7 @@ void main() {
 }
 `;
 
-const fragmentShader = `#version 300 es
-precision highp float;
+const fragmentShader = `precision highp float;
 precision highp int;
 
 uniform sampler2D Source;
