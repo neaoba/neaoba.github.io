@@ -1,0 +1,43 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #090b0e;
+  color: #eef2f6;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background:
+  radial-gradient(circle at 75% 10%, #1b2530 0, transparent 34rem),
+  linear-gradient(145deg, #0a0d11, #11161c); }
+button, select, input { font: inherit; }
+.app { width: min(1500px, 100%); margin: 0 auto; padding: 28px; }
+header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+h1 { font-size: clamp(34px, 5vw, 72px); line-height: .9; margin: 0; letter-spacing: -.055em; }
+.eyebrow { margin: 0 0 10px; letter-spacing: .18em; font-size: 11px; color: #89a9c4; }
+.sub { color: #98a3ad; margin: 12px 0 0; }
+.status { border: 1px solid #34404a; border-radius: 999px; padding: 8px 13px; color: #b7c6d1; font-size: 13px; }
+.layout { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 18px; min-height: 70vh; }
+.panel, .viewer { background: rgba(17,22,28,.86); border: 1px solid #27313a; border-radius: 18px; box-shadow: 0 24px 70px rgba(0,0,0,.32); }
+.panel { padding: 18px; overflow: auto; }
+.viewer { position: relative; overflow: auto; display: grid; place-items: center; min-height: 560px;
+  background-color: #080a0c;
+  background-image: linear-gradient(45deg,#11161b 25%,transparent 25%),linear-gradient(-45deg,#11161b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#11161b 75%),linear-gradient(-45deg,transparent 75%,#11161b 75%);
+  background-size: 24px 24px; background-position: 0 0,0 12px,12px -12px,-12px 0; }
+canvas { display: block; max-width: none; image-rendering: pixelated; box-shadow: 0 10px 45px rgba(0,0,0,.55); }
+.fileButton, button, select { border: 1px solid #3b4853; background: #192129; color: #edf4f8; border-radius: 10px; }
+.fileButton { display: block; text-align: center; padding: 11px; cursor: pointer; margin-bottom: 17px; }
+.fileButton:hover, button:hover { background: #23303a; }
+.fileButton input { display: none; }
+.control { margin: 15px 0; }
+.control > label, .rangeHead { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 7px; font-size: 13px; color: #c7d0d7; }
+select { width: 100%; padding: 8px 10px; }
+input[type=range] { width: 100%; accent-color: #a8c6db; }
+.value { color: #83a9c3; font-variant-numeric: tabular-nums; }
+.switch { display: flex; gap: 10px; align-items: center; margin: 17px 0; font-size: 14px; }
+.buttonRow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+button { padding: 9px; cursor: pointer; }
+.note { color: #82909b; font-size: 12px; line-height: 1.6; margin: 18px 1px 0; }
+@media (max-width: 850px) {
+  .app { padding: 16px; }
+  .layout { grid-template-columns: 1fr; }
+  .viewer { min-height: 55vh; }
+}

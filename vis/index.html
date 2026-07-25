@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LCD Grid v2 — three.js port</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <p class="eyebrow">RETROARCH SHADER PORT</p>
+        <h1>LCD Grid v2</h1>
+        <p class="sub">three.js / WebGL 2 リアルタイムプレビュー</p>
+      </div>
+      <span id="status" class="status">サンプル表示</span>
+    </header>
+
+    <section class="layout">
+      <aside class="panel">
+        <label class="fileButton">
+          画像・動画を選択
+          <input id="fileInput" type="file" accept="image/*,video/*" />
+        </label>
+
+        <div class="control">
+          <label for="scaleMode">表示倍率</label>
+          <select id="scaleMode">
+            <option value="fit">画面に合わせる</option>
+            <option value="1">1×</option>
+            <option value="2">2×</option>
+            <option value="3" selected>3×</option>
+            <option value="4">4×</option>
+            <option value="5">5×</option>
+            <option value="6">6×</option>
+          </select>
+        </div>
+
+        <div id="sliders"></div>
+
+        <label class="switch">
+          <input id="bgr" type="checkbox" />
+          <span>BGR配列</span>
+        </label>
+
+        <div class="buttonRow">
+          <button id="defaults">原版プリセット値</button>
+          <button id="savePng">PNG保存</button>
+        </div>
+
+        <p class="note">
+          原版の積分スミア、4近傍サンプリング、RGB/BGRサブピクセル、
+          ガンマ・黒レベル・環境光処理をWebGL 2向けに移植しています。
+        </p>
+      </aside>
+
+      <section class="viewer">
+        <canvas id="canvas"></canvas>
+        <video id="video" playsinline loop muted hidden></video>
+        <img id="image" alt="" hidden />
+      </section>
+    </section>
+  </main>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
+      }
+    }
+  </script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
